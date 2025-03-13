@@ -13,12 +13,14 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as UserIndexImport } from './routes/user/index'
+import { Route as NotesIndexImport } from './routes/notes/index'
 import { Route as UserProfileImport } from './routes/user/profile'
 import { Route as UserPasswordforgottenImport } from './routes/user/password_forgotten'
 import { Route as UserLogoutImport } from './routes/user/logout'
 import { Route as UserLoginImport } from './routes/user/login'
 import { Route as UserChangepasswordImport } from './routes/user/change_password'
 import { Route as UserAccessdeniedImport } from './routes/user/access_denied'
+import { Route as NotesNewImport } from './routes/notes/new'
 
 // Create/Update Routes
 
@@ -31,6 +33,12 @@ const IndexRoute = IndexImport.update({
 const UserIndexRoute = UserIndexImport.update({
   id: '/user/',
   path: '/user/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const NotesIndexRoute = NotesIndexImport.update({
+  id: '/notes/',
+  path: '/notes/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -70,6 +78,12 @@ const UserAccessdeniedRoute = UserAccessdeniedImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const NotesNewRoute = NotesNewImport.update({
+  id: '/notes/new',
+  path: '/notes/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -79,6 +93,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/notes/new': {
+      id: '/notes/new'
+      path: '/notes/new'
+      fullPath: '/notes/new'
+      preLoaderRoute: typeof NotesNewImport
       parentRoute: typeof rootRoute
     }
     '/user/access_denied': {
@@ -123,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserProfileImport
       parentRoute: typeof rootRoute
     }
+    '/notes/': {
+      id: '/notes/'
+      path: '/notes'
+      fullPath: '/notes'
+      preLoaderRoute: typeof NotesIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/user/': {
       id: '/user/'
       path: '/user'
@@ -137,35 +165,41 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/notes/new': typeof NotesNewRoute
   '/user/access_denied': typeof UserAccessdeniedRoute
   '/user/change_password': typeof UserChangepasswordRoute
   '/user/login': typeof UserLoginRoute
   '/user/logout': typeof UserLogoutRoute
   '/user/password_forgotten': typeof UserPasswordforgottenRoute
   '/user/profile': typeof UserProfileRoute
+  '/notes': typeof NotesIndexRoute
   '/user': typeof UserIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/notes/new': typeof NotesNewRoute
   '/user/access_denied': typeof UserAccessdeniedRoute
   '/user/change_password': typeof UserChangepasswordRoute
   '/user/login': typeof UserLoginRoute
   '/user/logout': typeof UserLogoutRoute
   '/user/password_forgotten': typeof UserPasswordforgottenRoute
   '/user/profile': typeof UserProfileRoute
+  '/notes': typeof NotesIndexRoute
   '/user': typeof UserIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/notes/new': typeof NotesNewRoute
   '/user/access_denied': typeof UserAccessdeniedRoute
   '/user/change_password': typeof UserChangepasswordRoute
   '/user/login': typeof UserLoginRoute
   '/user/logout': typeof UserLogoutRoute
   '/user/password_forgotten': typeof UserPasswordforgottenRoute
   '/user/profile': typeof UserProfileRoute
+  '/notes/': typeof NotesIndexRoute
   '/user/': typeof UserIndexRoute
 }
 
@@ -173,55 +207,65 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/notes/new'
     | '/user/access_denied'
     | '/user/change_password'
     | '/user/login'
     | '/user/logout'
     | '/user/password_forgotten'
     | '/user/profile'
+    | '/notes'
     | '/user'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/notes/new'
     | '/user/access_denied'
     | '/user/change_password'
     | '/user/login'
     | '/user/logout'
     | '/user/password_forgotten'
     | '/user/profile'
+    | '/notes'
     | '/user'
   id:
     | '__root__'
     | '/'
+    | '/notes/new'
     | '/user/access_denied'
     | '/user/change_password'
     | '/user/login'
     | '/user/logout'
     | '/user/password_forgotten'
     | '/user/profile'
+    | '/notes/'
     | '/user/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  NotesNewRoute: typeof NotesNewRoute
   UserAccessdeniedRoute: typeof UserAccessdeniedRoute
   UserChangepasswordRoute: typeof UserChangepasswordRoute
   UserLoginRoute: typeof UserLoginRoute
   UserLogoutRoute: typeof UserLogoutRoute
   UserPasswordforgottenRoute: typeof UserPasswordforgottenRoute
   UserProfileRoute: typeof UserProfileRoute
+  NotesIndexRoute: typeof NotesIndexRoute
   UserIndexRoute: typeof UserIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  NotesNewRoute: NotesNewRoute,
   UserAccessdeniedRoute: UserAccessdeniedRoute,
   UserChangepasswordRoute: UserChangepasswordRoute,
   UserLoginRoute: UserLoginRoute,
   UserLogoutRoute: UserLogoutRoute,
   UserPasswordforgottenRoute: UserPasswordforgottenRoute,
   UserProfileRoute: UserProfileRoute,
+  NotesIndexRoute: NotesIndexRoute,
   UserIndexRoute: UserIndexRoute,
 }
 
@@ -236,17 +280,22 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/notes/new",
         "/user/access_denied",
         "/user/change_password",
         "/user/login",
         "/user/logout",
         "/user/password_forgotten",
         "/user/profile",
+        "/notes/",
         "/user/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/notes/new": {
+      "filePath": "notes/new.tsx"
     },
     "/user/access_denied": {
       "filePath": "user/access_denied.tsx"
@@ -265,6 +314,9 @@ export const routeTree = rootRoute
     },
     "/user/profile": {
       "filePath": "user/profile.tsx"
+    },
+    "/notes/": {
+      "filePath": "notes/index.tsx"
     },
     "/user/": {
       "filePath": "user/index.tsx"
