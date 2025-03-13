@@ -11,20 +11,62 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as UserImport } from './routes/user'
 import { Route as IndexImport } from './routes/index'
+import { Route as UserIndexImport } from './routes/user/index'
+import { Route as UserProfileImport } from './routes/user/profile'
+import { Route as UserPasswordforgottenImport } from './routes/user/password_forgotten'
+import { Route as UserLogoutImport } from './routes/user/logout'
+import { Route as UserLoginImport } from './routes/user/login'
+import { Route as UserChangepasswordImport } from './routes/user/change_password'
+import { Route as UserAccessdeniedImport } from './routes/user/access_denied'
 
 // Create/Update Routes
-
-const UserRoute = UserImport.update({
-  id: '/user',
-  path: '/user',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UserIndexRoute = UserIndexImport.update({
+  id: '/user/',
+  path: '/user/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UserProfileRoute = UserProfileImport.update({
+  id: '/user/profile',
+  path: '/user/profile',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UserPasswordforgottenRoute = UserPasswordforgottenImport.update({
+  id: '/user/password_forgotten',
+  path: '/user/password_forgotten',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UserLogoutRoute = UserLogoutImport.update({
+  id: '/user/logout',
+  path: '/user/logout',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UserLoginRoute = UserLoginImport.update({
+  id: '/user/login',
+  path: '/user/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UserChangepasswordRoute = UserChangepasswordImport.update({
+  id: '/user/change_password',
+  path: '/user/change_password',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UserAccessdeniedRoute = UserAccessdeniedImport.update({
+  id: '/user/access_denied',
+  path: '/user/access_denied',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,11 +81,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/user': {
-      id: '/user'
+    '/user/access_denied': {
+      id: '/user/access_denied'
+      path: '/user/access_denied'
+      fullPath: '/user/access_denied'
+      preLoaderRoute: typeof UserAccessdeniedImport
+      parentRoute: typeof rootRoute
+    }
+    '/user/change_password': {
+      id: '/user/change_password'
+      path: '/user/change_password'
+      fullPath: '/user/change_password'
+      preLoaderRoute: typeof UserChangepasswordImport
+      parentRoute: typeof rootRoute
+    }
+    '/user/login': {
+      id: '/user/login'
+      path: '/user/login'
+      fullPath: '/user/login'
+      preLoaderRoute: typeof UserLoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/user/logout': {
+      id: '/user/logout'
+      path: '/user/logout'
+      fullPath: '/user/logout'
+      preLoaderRoute: typeof UserLogoutImport
+      parentRoute: typeof rootRoute
+    }
+    '/user/password_forgotten': {
+      id: '/user/password_forgotten'
+      path: '/user/password_forgotten'
+      fullPath: '/user/password_forgotten'
+      preLoaderRoute: typeof UserPasswordforgottenImport
+      parentRoute: typeof rootRoute
+    }
+    '/user/profile': {
+      id: '/user/profile'
+      path: '/user/profile'
+      fullPath: '/user/profile'
+      preLoaderRoute: typeof UserProfileImport
+      parentRoute: typeof rootRoute
+    }
+    '/user/': {
+      id: '/user/'
       path: '/user'
       fullPath: '/user'
-      preLoaderRoute: typeof UserImport
+      preLoaderRoute: typeof UserIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -53,37 +137,92 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/user': typeof UserRoute
+  '/user/access_denied': typeof UserAccessdeniedRoute
+  '/user/change_password': typeof UserChangepasswordRoute
+  '/user/login': typeof UserLoginRoute
+  '/user/logout': typeof UserLogoutRoute
+  '/user/password_forgotten': typeof UserPasswordforgottenRoute
+  '/user/profile': typeof UserProfileRoute
+  '/user': typeof UserIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/user': typeof UserRoute
+  '/user/access_denied': typeof UserAccessdeniedRoute
+  '/user/change_password': typeof UserChangepasswordRoute
+  '/user/login': typeof UserLoginRoute
+  '/user/logout': typeof UserLogoutRoute
+  '/user/password_forgotten': typeof UserPasswordforgottenRoute
+  '/user/profile': typeof UserProfileRoute
+  '/user': typeof UserIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/user': typeof UserRoute
+  '/user/access_denied': typeof UserAccessdeniedRoute
+  '/user/change_password': typeof UserChangepasswordRoute
+  '/user/login': typeof UserLoginRoute
+  '/user/logout': typeof UserLogoutRoute
+  '/user/password_forgotten': typeof UserPasswordforgottenRoute
+  '/user/profile': typeof UserProfileRoute
+  '/user/': typeof UserIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/user'
+  fullPaths:
+    | '/'
+    | '/user/access_denied'
+    | '/user/change_password'
+    | '/user/login'
+    | '/user/logout'
+    | '/user/password_forgotten'
+    | '/user/profile'
+    | '/user'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/user'
-  id: '__root__' | '/' | '/user'
+  to:
+    | '/'
+    | '/user/access_denied'
+    | '/user/change_password'
+    | '/user/login'
+    | '/user/logout'
+    | '/user/password_forgotten'
+    | '/user/profile'
+    | '/user'
+  id:
+    | '__root__'
+    | '/'
+    | '/user/access_denied'
+    | '/user/change_password'
+    | '/user/login'
+    | '/user/logout'
+    | '/user/password_forgotten'
+    | '/user/profile'
+    | '/user/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  UserRoute: typeof UserRoute
+  UserAccessdeniedRoute: typeof UserAccessdeniedRoute
+  UserChangepasswordRoute: typeof UserChangepasswordRoute
+  UserLoginRoute: typeof UserLoginRoute
+  UserLogoutRoute: typeof UserLogoutRoute
+  UserPasswordforgottenRoute: typeof UserPasswordforgottenRoute
+  UserProfileRoute: typeof UserProfileRoute
+  UserIndexRoute: typeof UserIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  UserRoute: UserRoute,
+  UserAccessdeniedRoute: UserAccessdeniedRoute,
+  UserChangepasswordRoute: UserChangepasswordRoute,
+  UserLoginRoute: UserLoginRoute,
+  UserLogoutRoute: UserLogoutRoute,
+  UserPasswordforgottenRoute: UserPasswordforgottenRoute,
+  UserProfileRoute: UserProfileRoute,
+  UserIndexRoute: UserIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,14 +236,38 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/user"
+        "/user/access_denied",
+        "/user/change_password",
+        "/user/login",
+        "/user/logout",
+        "/user/password_forgotten",
+        "/user/profile",
+        "/user/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/user": {
-      "filePath": "user.tsx"
+    "/user/access_denied": {
+      "filePath": "user/access_denied.tsx"
+    },
+    "/user/change_password": {
+      "filePath": "user/change_password.tsx"
+    },
+    "/user/login": {
+      "filePath": "user/login.tsx"
+    },
+    "/user/logout": {
+      "filePath": "user/logout.tsx"
+    },
+    "/user/password_forgotten": {
+      "filePath": "user/password_forgotten.tsx"
+    },
+    "/user/profile": {
+      "filePath": "user/profile.tsx"
+    },
+    "/user/": {
+      "filePath": "user/index.tsx"
     }
   }
 }

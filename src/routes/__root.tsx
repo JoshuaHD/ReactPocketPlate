@@ -1,4 +1,6 @@
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
+import TanstackLink from '@/components/ui/TanstackLink.js'
+import AuthLink from '@/components/user/AuthLink.js'
+import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import PWABadge from '../PWABadge.js'
 
@@ -6,13 +8,14 @@ export const Route = createRootRoute({
   component: () => (
     <>
       <div className="p-2 flex gap-2">
-        <Link to="/" className="[&.active]:font-bold">
+        <TanstackLink to="/" className="[&.active]:font-bold">
           Home
-        </Link>{' '}
-        <Link to="/user" className="[&.active]:font-bold">
+        </TanstackLink>{' '}
+        <TanstackLink to="/user" className="[&.active]:font-bold">
           User
-        </Link>
+        </TanstackLink>
         
+        <div className='ml-auto'><AuthLink /></div>
       </div>
       <hr />
       <Outlet />
