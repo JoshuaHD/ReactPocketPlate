@@ -15,9 +15,6 @@ export const Route = createRootRoute({
         <TanstackLink to="/user" className="[&.active]:font-bold">
           User
         </TanstackLink>{' '}
-        <TanstackLink to="/notes" className="[&.active]:font-bold">
-          Notes
-        </TanstackLink>
 
         <div className='ml-auto'><AuthLink /></div>
       </div>
