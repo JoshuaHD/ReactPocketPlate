@@ -1,5 +1,5 @@
 
-import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 export default function DevTools() {
     if (process.env.NODE_ENV !== "development") return null; // Skip completely in production
