@@ -122,3 +122,23 @@
     @apply bg-background text-foreground;
   }
 }
+@layer components {
+  .message {
+    @apply bg-stone-100 border-stone-200 text-stone-800;
+  }
+  .success {
+    @apply bg-green-100 border-green-200 text-green-700;
+  }
+  
+  .warning {
+    @apply bg-yellow-100 border-yellow-200 text-yellow-800;
+  }
+  
+  .info {
+    @apply bg-sky-100 border-sky-200 text-sky-900;
+  }
+  
+  .error {
+    @apply bg-red-100 border-red-200 text-red-700;
+  }
+}
