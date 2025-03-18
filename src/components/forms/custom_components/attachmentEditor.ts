@@ -13,6 +13,23 @@ export const allowedFileTypePresets = {
     "image/webp",
     "image/tiff",
   ],
+  audio: [
+    "audio/aac", // AAC audio
+    "audio/flac", // FLAC audio
+    "audio/midi", // MIDI audio
+    "audio/mpeg", // MP3 audio
+    "audio/ogg", // OGG Vorbis audio
+    "audio/opus", // Opus audio
+    "audio/wav", // WAV audio
+    "audio/webm", // WebM audio
+    "audio/3gpp", // 3GPP audio (mobile)
+    "audio/3gpp2", // 3GPP2 audio (mobile)
+    "audio/x-wav", // WAV (alternative)
+    "audio/x-m4a", // M4A audio (Apple)
+    "audio/x-ms-wma", // WMA audio (Windows Media)
+    "audio/x-aiff", // AIFF audio
+    "audio/x-flac" // FLAC audio (alternative)
+  ],
   videos: [
     "video/mp4",
     "video/mpeg",
