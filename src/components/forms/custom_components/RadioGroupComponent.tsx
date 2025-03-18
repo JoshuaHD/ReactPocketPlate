@@ -6,23 +6,23 @@ import { z } from "zod"
 
 type RadioGroupOption = {
     value: string
-    label: string|number|React.ReactNode
+    label: string | number | React.ReactNode
 }
 
-type RadioGroupFormField =  {
+type RadioGroupFormField = {
     options: RadioGroupOption[],
-    layout?: "row"|"col",
+    layout?: "row" | "col",
 
     field?: {
         options?: RadioGroupOption[],
-        layout?: "row"|"col",
+        layout?: "row" | "col",
     }
 }
 
 const RadioGroupFormField = (props: RadioGroupFormField & ComponentProps<typeof RadioGroupPrimitive.Root>) => {
     const styles = {
-        row : "grid grid-cols-1 md:grid-cols-4 space-y-1",
-        col: "flex flex-col space-y-1",
+        row: "grid grid-cols-2 sm:grid-cols-3 gap-y-4",
+        col: "flex flex-col space-y-0",
     }
 
     const style: string = styles[props.layout as keyof typeof styles ?? "col"]
@@ -34,15 +34,14 @@ const RadioGroupFormField = (props: RadioGroupFormField & ComponentProps<typeof 
         className={style}
     >
         {props.options.map((option: RadioGroupOption, i: number) => {
-        
-        return <FormItem key={i} className="flex items-center space-y-0">
-            <FormControl>
-                <RadioGroupItem value={option.value} />
-            </FormControl>
-            <FormLabel className="font-normal">
-               {option.label}
-            </FormLabel>
-        </FormItem>
+            return <FormItem key={i} className="flex items-center space-y-0 space-x-1">
+                <FormControl>
+                    <RadioGroupItem value={option.value} />
+                </FormControl>
+                <FormLabel className="font-normal">
+                    {option.label}
+                </FormLabel>
+            </FormItem>
         })}
     </RadioGroup>
 }
@@ -50,7 +49,7 @@ const RadioGroupFormField = (props: RadioGroupFormField & ComponentProps<typeof 
 
 const RadioGroupComponent = {
     component: RadioGroupFormField,
-    props: (field: ComponentProps<typeof RadioGroupFormField> & RadioGroupFormField) => {        
+    props: (field: ComponentProps<typeof RadioGroupFormField> & RadioGroupFormField) => {
         return field
     }
 }
@@ -58,4 +57,4 @@ const RadioGroupComponent = {
 export default RadioGroupComponent
 
 
-export const radioGroupFieldSchema = (required: boolean) => z.string().min((required) ? 1 : 0, {message: "Please select an option"})
+export const radioGroupFieldSchema = (required: boolean) => z.string().min((required) ? 1 : 0, { message: "Please select an option" })
