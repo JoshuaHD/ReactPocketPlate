@@ -5,10 +5,10 @@ import { z, ZodType } from "zod";
 export type ZodFormFieldMetaData<T> = {
     defaultValue?: T | ((data?: any, allData?: any, name?: any) => T),
     label?: string,
-    field?: Partial<HTMLInputElement>,
+    field?: Partial<HTMLInputElement> & {options?: any},
     component?: {
         component: ComponentType<any>,
-        props?: (field: ComponentProps<ComponentType>, form?: UseFormReturn<any, any, undefined>) => ComponentProps<ComponentType>
+        props?: (field: ComponentProps<ComponentType> & any, form?: UseFormReturn<any, any, undefined>) => ComponentProps<ComponentType>
     }
 }
 
@@ -17,7 +17,7 @@ export type ZodFormMetadata<T> = {
 } & Record<string, any>; // <-- Allow additional dynamic fields
 
 // Generic function that accepts any Zod schema and generates metadata with the same keys
-export function createZodFormMetadata<T extends ZodType<any>>(_schema: T): ZodFormMetadata<z.infer< T>> {
+export function createZodFormMetadata<T extends ZodType<any>>(_schema: T): ZodFormMetadata<z.infer<T>> {
     type SchemaType = z.infer<T>;
 
     const metadata: {
