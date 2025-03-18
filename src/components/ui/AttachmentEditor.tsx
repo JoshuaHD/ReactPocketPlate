@@ -241,9 +241,9 @@ export default function AttachmentEditor(props: AttachmentEditor) {
             {files.length}/{props.options?.maxFiles ?? "∞"} files {(Array.from(files).reduce((acc, file) => acc + file.size, 0) / (1024 * 1024)).toFixed(2)}/{props.options?.uploadSizeLimitMb ?? "∞"}MB
           </span>
         </div>
-        {files.length + existing_attachments.length < 1 && <div className="p-6">
-          <PackageOpen className="text-slate-500 m-auto" size={64} />
-        </div>}
+        {files.length + existing_attachments.length < 1 && <label htmlFor={fieldId} className="cursor-pointer p-6">
+          <PackageOpen className="text-stone-300 m-auto" size={64} />
+        </label>}
         {existingFiles}
         <div>
           {files.map((file, index) => {
