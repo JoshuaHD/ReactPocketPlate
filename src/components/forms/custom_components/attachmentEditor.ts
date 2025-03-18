@@ -117,37 +117,6 @@ export const getAttachmentZodSchema = (options?: AttachmentEditorOptions) => {
 }
 }
 
-
-/*
-  DOES NOT WORK
-*/
-export function enhanceSchemaWithAttachments(
-    baseSchema: z.ZodObject<any>,
-    filesFieldName: string,
-    options?: AttachmentEditorOptions
-  ) {
-
-    const fields = {
-      [`${filesFieldName}-`]: z
-        .array(z.string())
-        .transform((val) => (val.length < 1 ? undefined : val))
-        .optional(),
-      [`_${filesFieldName}`]: z.any(), // Placeholder field, gets discarded
-      [`${filesFieldName}+`]: getFileUploadFieldsZodSchema(options ?? {}).optional(), // Field to add files
-    }
-
-    // Define the additional file fields
-    const attachmentFields = z.object(fields);
-  
-    return baseSchema
-      .merge(attachmentFields) // Merge into the existing schema
-      .transform((data) => {
-        let newData = { ...data };
-        delete newData[`_${filesFieldName}`]; // Remove placeholder field
-        return newData;
-      });
-  }
-
 const getFileUploadFieldsZodSchema = ({ uploadSizeLimitMb, maxFiles, allowedFileTypes }: AttachmentEditorOptions) => {
   // Conditionally add refiners
   let fileListSchema: any = z.instanceof(FileList).transform((val) => Array.from(val as any));
