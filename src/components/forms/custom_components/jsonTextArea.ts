@@ -1,12 +1,17 @@
 import JsonTextArea from "@/components/ui/JsonTextArea.js";
 import { z } from "zod";
 
-export function getJsonTextArea (label: string) {
+export function getJsonTextArea (label: string, placeholder?: string) {
     return {
         defaultValue: (data: any) => (data) ? JSON.stringify(data, null, 2) : "",
         label,
         component: {
-            component: JsonTextArea
+            component: JsonTextArea,
+            props: (field: any) => {
+                field.placeholder = placeholder ?? "JSON"
+
+                return field
+            }
         }
     }
 }
