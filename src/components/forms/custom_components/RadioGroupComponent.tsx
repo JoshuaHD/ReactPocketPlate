@@ -2,6 +2,7 @@ import { FormItem, FormControl, FormLabel } from "@/components/ui/form.js"
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group.js"
 import { ComponentProps } from "react"
+import { z } from "zod"
 
 type RadioGroupOption = {
     value: string
@@ -55,3 +56,6 @@ const RadioGroupComponent = {
 }
 
 export default RadioGroupComponent
+
+
+export const radioGroupFieldSchema = (required: boolean) => z.string().min((required) ? 1 : 0, {message: "Please select an option"})
