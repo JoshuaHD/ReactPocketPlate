@@ -52,5 +52,5 @@ export const useAuth = () => {
     
     setUser(authData.record)
   }
-  return { user, login, logout, refresh, update, changePassword, requestOTP, authWithOTP };
+  return { user, login, logout, refresh, update, changePassword, requestOTP, authWithOTP, isAuthenticated: !!user?.id, authStore: pb.authStore };
 };
