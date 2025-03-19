@@ -14,7 +14,6 @@ export function getPbClients(collection: string) {
                 queryFn: () => pb.collection(collection).getOne(id, options),
                 staleTime: 5 * 1000,
                 retry: (failureCount: number, error: any) => {
-                    console.log({ error })
                     if (error?.status === 404) {
                         return false; // Do NOT retry on 404 Not Found
                     }
@@ -31,7 +30,6 @@ export function getPbClients(collection: string) {
                 queryFn: () => pb.collection(collection).getFullList(options),
                 staleTime: 5 * 1000,
                 retry: (failureCount: number, error: any) => {
-                    console.log({ error })
                     if (error?.status === 404) {
                         return false; // Do NOT retry on 404 Not Found
                     }
