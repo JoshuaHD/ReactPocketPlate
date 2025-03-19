@@ -39,7 +39,6 @@ const CheckboxGroupFormField = (props: CheckboxGroupFormField) => {
             //control={form.control}
             name={props.name}
             render={({ field }) => {
-                console.log(field)
                 return (
                     <FormItem
                         key={item.value}
@@ -50,8 +49,6 @@ const CheckboxGroupFormField = (props: CheckboxGroupFormField) => {
                                 checked={field.value?.includes(item.value)}
                                 value={item.value}
                                 onCheckedChange={(checked) => {
-                                    console.log({ checked, item })
-
                                     return checked
                                         ? field.onChange([...field.value, item.value])
                                         : field.onChange(
