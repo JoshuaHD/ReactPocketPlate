@@ -35,7 +35,9 @@ export default function PasswordLoginForm() {
         try {
             await login(values.email, values.password)
 
-            router.navigate({ to: "/user" })
+            // Get the value of the "redirect" query parameter
+            const redirect = (new URLSearchParams(window.location.search)).get('redirect');
+            router.navigate({ to: redirect || "/user" })
         } catch (err: any) {
             form.setError("password", { type: "manual", message: err.message });
         }

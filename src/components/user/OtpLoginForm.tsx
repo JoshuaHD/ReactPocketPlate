@@ -64,7 +64,9 @@ export default function OtpLoginForm() {
             // authenticate with the requested OTP id and the email password
             await authWithOTP(otpId, values.otp)
 
-            router.navigate({ to: "/user" })
+            // Get the value of the "redirect" query parameter
+            const redirect = (new URLSearchParams(window.location.search)).get('redirect');
+            router.navigate({ to: redirect || "/user" })
         } catch (err: any) {
             formStep2.setError("otp", { type: "manual", message: err.message });
         }
@@ -81,7 +83,7 @@ export default function OtpLoginForm() {
                             <FormItem>
                                 <FormLabel>Email</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="" {...field} />
+                                    <Input type="email" placeholder="" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
