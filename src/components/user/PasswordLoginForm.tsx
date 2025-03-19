@@ -51,7 +51,7 @@ export default function PasswordLoginForm() {
                         <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                                <Input placeholder="" {...field} />
+                                <Input type={"email"} placeholder="" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
