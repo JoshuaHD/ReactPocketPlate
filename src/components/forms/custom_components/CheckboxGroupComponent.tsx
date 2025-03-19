@@ -14,6 +14,7 @@ type CheckboxGroupOption = {
 }
 
 type CheckboxGroupFormField = {
+    name: string,
     options: CheckboxGroupOption[],
     layout?: "row" | "col",
 
@@ -25,14 +26,12 @@ type CheckboxGroupFormField = {
 } & ComponentProps<typeof Checkbox> & typeof Checkbox
 
 const CheckboxGroupFormField = (props: CheckboxGroupFormField) => {
-    console.log({ props })
     const styles = {
         row: "grid grid-cols-2 sm:grid-cols-3 gap-y-4",
         col: "flex flex-col space-y-1",
     }
 
     const style: string = styles[props.layout as keyof typeof styles ?? "col"]
-
 
     return <div className={style}>{props.options.map((item) => (
         <FormField
@@ -60,7 +59,6 @@ const CheckboxGroupFormField = (props: CheckboxGroupFormField) => {
                                                 (value: string) => value !== item.value
                                             )
                                         )
-
                                 }}
                             />
                         </FormControl>
