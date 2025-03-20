@@ -8,9 +8,9 @@ import OtpLoginForm from "./OtpLoginForm.js"
 import { azureAuthEnabled, otpAuthEnabled } from "@/settings.js"
 
 export default function LoginPage() {
-    const { user } = useAuth()
+    const { isAuthenticated } = useAuth()
 
-    if (user)
+    if (isAuthenticated())
         return <UserProfile />
 
     return (

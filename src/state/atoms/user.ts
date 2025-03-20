@@ -49,5 +49,28 @@ export const useAuth = () => {
     
     setUser(authData.record)
   }
-  return { user, login, logout, refresh, update, changePassword, requestOTP, authWithOTP, isAuthenticated: !!user?.id, authStore: pb.authStore };
+
+  const isAuthenticated = () => {
+    return pb.authStore.record?.id && pb.authStore.isValid
+  }
+  
+  const isTokenExpired = () => {
+    const token = ""
+
+    if (!token) return true; // No token means it's expired or invalid
+
+    try {
+        const payloadBase64 = token.split('.')[1]; // Extract payload
+        const decodedPayload = JSON.parse(atob(payloadBase64)); // Decode JSON
+        const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+
+        return decodedPayload.exp < currentTime; // Compare expiration
+    } catch (error) {
+        console.error("Invalid token:", error);
+        return true; // Treat invalid tokens as expired
+    }
+
+  }
+
+  return { user, login, logout, refresh, update, changePassword, requestOTP, authWithOTP, isAuthenticated, authStore: pb.authStore, isTokenExpired };
 };
