@@ -54,8 +54,8 @@ export const useAuth = () => {
     return pb.authStore.record?.id && pb.authStore.isValid
   }
   
-  const isTokenExpired = () => {
-    const token = ""
+  const isTokenExpired = (jwt_token?: string) => {
+    const token = pb.authStore.token ?? jwt_token
 
     if (!token) return true; // No token means it's expired or invalid
 
