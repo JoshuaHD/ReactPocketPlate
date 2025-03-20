@@ -16,7 +16,7 @@ const router = createRouter({
   defaultPreload: 'intent',
   scrollRestoration: true,
   scrollRestorationBehavior: "auto",
-  defaultErrorComponent: ({ error }) => {
+  defaultErrorComponent: ({ error }: {error: any}) => {
     return <Message standalone type="error">Error: {error?.message}</Message>
   },
   defaultNotFoundComponent: () => <Message standalone={true} type="error">Not Found ¯\_(ツ)_/¯</Message>,
