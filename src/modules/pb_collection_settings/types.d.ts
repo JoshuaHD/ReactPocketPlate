@@ -2,8 +2,8 @@
 export type PageSetup<TSchema> = {
     collection: string;
     queryOptions?: RecordOptions;  
-    renderListRow: (row: RecordModel) => React.ReactNode;
-  
+    listEntriesProps: ListEntriesProps,
+
     // Use ZodSchema for form schemas to ensure type safety
     formCreateSchema: ZodSchema<TSchema>;
   

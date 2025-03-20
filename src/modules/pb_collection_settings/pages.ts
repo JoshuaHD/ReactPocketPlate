@@ -5,7 +5,7 @@ const pages: Pages = {
     notes: {
         collection: notes.collection,
         queryOptions: notes.queryOptions,
-        renderListRow: notes.renderListRow,
+        listEntriesProps: notes.listEntriesProps,
         formCreateSchema: notes.formCreateSchema,
         formCreateMetadata: notes.formCreateMetadata,
         formUpdateSchema: notes.formUpdateSchema,

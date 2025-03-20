@@ -8,24 +8,32 @@ import { RecordFullListOptions, RecordModel } from "pocketbase";
 import { Bounce, toast, ToastContentProps } from "react-toastify";
 import DeleteEntry from './DeleteEntry.js'
 
-type ListEntries = {
-    collection: string,
-    queryOptions?: RecordFullListOptions,
+
+type ListRowOptions = {
     renderRow?: (row: RecordModel) => React.ReactNode | string | number
     showViewLink?: boolean
     showDeleteLink?: boolean
     showEditLink?: boolean
-    listRowClickLink?: "edit"|""|"delete"
+    rowClickAction?: "edit"|"delete"|"view"
 }
-export default function ListEntries({ collection, queryOptions, renderRow, showViewLink, showDeleteLink, showEditLink, listRowClickLink }: ListEntries) {
+
+export type ListEntriesProps = {} & ListRowOptions
+type ListEntries = {
+    collection: string,
+    queryOptions?: RecordFullListOptions
+} & ListEntriesProps
+
+export default function ListEntries({ collection, queryOptions, renderRow, showViewLink, showDeleteLink, showEditLink, rowClickAction }: ListEntries) {
     const { isPending, error, data, isFetching } = useQuery(getPbClients(collection).getFullList(queryOptions))
 
-    listRowClickLink = listRowClickLink ?? "edit"
+    rowClickAction = rowClickAction ?? "view"
 
     return <div className="max-w-4xl">
         <DataLoader isPending={isPending} isFetching={isFetching} error={error}>
             {data?.map((row) => {
                 const showRow = (typeof renderRow === "function") ? renderRow(row) : row.id
+
+                const rowClickLink = (rowClickAction === "view") ? `./${row.id}` : `./${row.id}/${rowClickAction}`
 
                 function CustomNotification({ closeToast }: ToastContentProps) {
                     return (
@@ -48,15 +56,15 @@ export default function ListEntries({ collection, queryOptions, renderRow, showV
                     );
                 };
                 return <div key={row.id} className={"flex p-2 hover:bg-slate-200"}>
-                    <TanstackLink to={`./${row.id}/${listRowClickLink}`} className="flex-1">
+                    <TanstackLink to={rowClickLink} className="flex-1">
                         {showRow}
                     </TanstackLink>
 
-                    {(showViewLink || listRowClickLink !== "") && <Button asChild variant="ghost">
+                    {(showViewLink || rowClickAction !== "view") && <Button asChild variant="ghost">
                         <TanstackLink to={`./${row.id}`}><Eye /></TanstackLink>
                     </Button>}
 
-                    {(showEditLink || listRowClickLink !== "edit") && <Button asChild variant="ghost">
+                    {(showEditLink || rowClickAction !== "edit") && <Button asChild variant="ghost">
                         <TanstackLink to={`./${row.id}/edit`}><Edit /></TanstackLink>
                     </Button>}
 

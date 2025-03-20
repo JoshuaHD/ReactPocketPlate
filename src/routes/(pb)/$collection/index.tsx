@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button.js'
 import TanstackLink from '@/components/ui/TanstackLink.js'
+import { PageSetup } from '@/modules/pb_collection_settings/types.js'
 import ListEntries from '@/modules/pb_form/ListEntries.js'
 import queryClient, { getPbClients } from '@/state/queryClient.js'
 import { createFileRoute } from '@tanstack/react-router'
@@ -62,10 +63,10 @@ export function FloatingActionButton() {
 
 function RouteComponent() {
   const loaderData = Route.useLoaderData()
-  const { collection, renderListRow, queryOptions } = loaderData.collection_settings
+  const { collection, listEntriesProps, queryOptions } = loaderData.collection_settings as PageSetup<any>
 
   return <div>
-    <ListEntries collection={collection} renderRow={renderListRow} queryOptions={queryOptions} listRowClickLink={""} showDeleteLink />
+    <ListEntries collection={collection} queryOptions={queryOptions} {...listEntriesProps} />
 
     <FloatingActionButton />
   </div>
