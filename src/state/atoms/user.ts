@@ -21,7 +21,6 @@ export const useAuth = () => {
 
   const refresh = async () => {
     const authData = await pb.collection("users").authRefresh()
-    console.log({ authData })
     setUser(authData.record)
   }
 
@@ -30,8 +29,6 @@ export const useAuth = () => {
       throw Error("You need to be logged in to change your password!")
 
     const data = { oldPassword, password, passwordConfirm };
-
-    console.log({ data })
 
     await pb.collection('users').update(user?.id, data);
 

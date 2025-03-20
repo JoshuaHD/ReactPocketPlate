@@ -37,13 +37,10 @@ export default function ChangePasswordForm() {
             await changePassword(values.oldPassword, values.password, values.passwordConfirm)
             setSuccess(true)
         } catch (err: any) {
-            console.log({ err })
-
             if (err?.response?.data?.oldPassword?.message)
                 form.setError("oldPassword", { type: "manual", message: err?.response?.data?.oldPassword?.message });
             if (err?.response?.data?.password?.message)
                 form.setError("password", { type: "manual", message: err?.response?.data?.password?.message });
-
         }
     }
 
