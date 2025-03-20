@@ -24,7 +24,7 @@ export function SelectFormField (props: SelectFormField & ComponentProps<typeof 
         defaultValue={props.value}>
         <FormControl>
             <SelectTrigger>
-                <SelectValue placeholder="Select a verified email to display" />
+                <SelectValue placeholder="Please select an option" />
             </SelectTrigger>
         </FormControl>
         <SelectContent>
