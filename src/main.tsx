@@ -7,15 +7,34 @@ import queryClient from '@/state/queryClient.js'
 // Import the generated route tree
 import { routeTree } from './routeTree.gen.js'
 import './styles/main.css'
+import { useAuth } from './state/atoms/user.js'
+import { Message } from './components/ui/Message.js'
 
 // Create a new router instance
-const router = createRouter({ routeTree })
+const router = createRouter({ 
+  routeTree,
+  defaultPreload: 'intent',
+  scrollRestoration: true,
+  scrollRestorationBehavior: "auto",
+  defaultErrorComponent: ({ error }) => {
+    return <Message standalone type="error">Error: {error?.message}</Message>
+  },
+  defaultNotFoundComponent: () => <Message standalone={true} type="error">Not Found ¯\_(ツ)_/¯</Message>,
+})
 
 // Register the router instance for type safety
 declare module '@tanstack/react-router' {
   interface Register {
-    router: typeof router
+    router: typeof router,
+    context: {
+      auth: undefined
+    }
   }
+}
+
+function InnerApp() {
+  const auth = useAuth()
+  return <RouterProvider router={router} context={{ auth }} />
 }
 
 // Render the app
@@ -25,7 +44,7 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <InnerApp />
       </QueryClientProvider>
     </StrictMode>,
   )
