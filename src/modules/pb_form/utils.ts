@@ -1,4 +1,6 @@
+import FormBlockerToast from "@/components/ui/FormBlockerToast.js";
 import { FieldError, FieldErrors, FieldErrorsImpl, Merge } from "react-hook-form";
+import { toast } from "react-toastify";
 
 
 export type OrphanError = {
@@ -20,8 +22,30 @@ export const getOrphanErrors = (errors: FieldErrors, fields: string[]): OrphanEr
 }
 
 export const formBlocker = (isDirty: boolean) => () => {
-    return (
-        isDirty &&
-        !window.confirm("You have unsaved changes. \nAre you sure you want to leave? \nClick OK to discard changes or Cancel to stay.")
-    )
-}
+    const DONT_BLOCK_NAVIGATION = false;
+    const BLOCK_NAVIGATION = true;
+  
+    if (!isDirty)
+        return DONT_BLOCK_NAVIGATION
+  
+    const shouldBlock = new Promise<boolean>((resolve) => {
+        // Using a modal manager of your choice
+        const notify = () => {
+            toast.warn(FormBlockerToast, {
+                autoClose: false, // Make sure the toast doesn't auto-close
+                closeButton: false, // Remove the close button
+                closeOnClick: false,
+                onClose(reason) {
+                    if(reason==="cancel")
+                        return resolve(BLOCK_NAVIGATION)
+                    
+                    return resolve(DONT_BLOCK_NAVIGATION)
+                },
+            });
+        };
+  
+        notify()
+    })
+  
+    return shouldBlock
+  }
