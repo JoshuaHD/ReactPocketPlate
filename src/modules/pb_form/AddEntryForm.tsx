@@ -35,7 +35,7 @@ export default function AddEntryForm<T extends ZodRawShape>({ collection, formSc
         resolver: zodResolver(formSchema),
         defaultValues: getDefaultValuesFromZodFormMetadata(formMetaData, {}) as any,
     })
-    
+
     // When this mutation succeeds, invalidate any queries with the `todos` or `reminders` query key
     const mutation = useMutation({
         mutationFn: (values: Partial<RecordModel>) => pb.collection(collection).create(values),
@@ -45,8 +45,8 @@ export default function AddEntryForm<T extends ZodRawShape>({ collection, formSc
     })
 
     const [orphanErrors, setOrphanErrors] = useState<OrphanError[]>([])
-    
-    useEffect(() =>{
+
+    useEffect(() => {
         setOrphanErrors(getOrphanErrors(form.formState.errors, Object.keys(formMetaData)))
     }, [form.formState.errors])
 
@@ -92,14 +92,16 @@ export default function AddEntryForm<T extends ZodRawShape>({ collection, formSc
 
     return (<div className={"max-w-lg p-4"}>
         <Form key={formId} {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 grid grid-cols-12 gap-6">
                 {Object.entries(formMetaData).map(([key, field]) => {
                     return <ZodFormField key={key} form={form} name={key} fieldMetaData={field} />
                 })}
-                {orphanErrors?.map((error) => {
-                    return <FormMessage key={error.name}><>{error.name}: {error.err?.message}</></FormMessage>
-                })}
-                {buttons}
+                <div className="col-span-12">
+                    {orphanErrors?.map((error) => {
+                        return <FormMessage key={error.name}><>{error.name}: {error.err?.message}</></FormMessage>
+                    })}
+                    {buttons}
+                </div>
             </form>
         </Form>
     </div>

@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z, ZodSchema, ZodRawShape, isDirty } from "zod"
+import { z, ZodSchema, ZodRawShape } from "zod"
 import { Button } from "@/components/ui/button.js"
 import { Form, FormMessage } from "@/components/ui/form.js"
 import { getDefaultValuesFromZodFormMetadata, ZodFormMetadata } from "@/components/forms/zod_schema_helpers.js";
@@ -28,6 +28,7 @@ export default function UpdateEntryForm<T extends ZodRawShape>({ recordId, colle
     const canGoBack = useCanGoBack()
     const [action, setAction] = useState<"back" | "stay">()
     const { data } = useQuery(getPbClients(collection).getOne(recordId))
+    const [formId, _setFormId] = useState(new Date().getTime())
 
     // When this mutation succeeds, invalidate any queries with the `todos` or `reminders` query key
     const mutation = useMutation({
@@ -44,8 +45,8 @@ export default function UpdateEntryForm<T extends ZodRawShape>({ recordId, colle
     })
 
     const [orphanErrors, setOrphanErrors] = useState<OrphanError[]>([])
-    
-    useEffect(() =>{
+
+    useEffect(() => {
         setOrphanErrors(getOrphanErrors(form.formState.errors, Object.keys(formMetaData)))
     }, [form.formState.errors])
 
@@ -87,20 +88,23 @@ export default function UpdateEntryForm<T extends ZodRawShape>({ recordId, colle
 
     const buttons = <div className="flex justify-center gap-2">
         {canGoBack && <Button onClick={() => setAction("back")} disabled={form.formState.isSubmitting} type="submit">Submit{form.formState.isSubmitting && <>ing <Loader2 className="animate-spin" /></>}</Button>}
-        <Button onClick={() => setAction("stay")} disabled={form.formState.isSubmitting || !isDirty} type="submit">Save{form.formState.isSubmitting && <>ing only <Loader2 className="animate-spin" /></>}</Button>
+        <Button onClick={() => setAction("stay")} disabled={form.formState.isSubmitting || !form.formState.isDirty} type="submit">Save{form.formState.isSubmitting && <>ing only <Loader2 className="animate-spin" /></>}</Button>
     </div>
 
     return (<div className={"max-w-lg p-4"}>
-        <Form key={data?.id ?? "-loading-"} {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <Form key={formId} {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 grid grid-cols-12 gap-6">
                 {Object.entries(formMetaData).map(([key, field]) => {
                     return <ZodFormField key={key} form={form} name={key} fieldMetaData={field} />
                 })}
-                {orphanErrors?.map((error) => {
-                    return <FormMessage key={error.name}><>{error.name}: {error.err?.message}</></FormMessage>
-                })}
-                {buttons}
+                <div className="col-span-12">
+                    {orphanErrors?.map((error) => {
+                        return <FormMessage key={error.name}><>{error.name}: {error.err?.message}</></FormMessage>
+                    })}
+                    {buttons}
+                </div>
             </form>
         </Form>
-    </div>)
+    </div>
+    )
 }
