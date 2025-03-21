@@ -1,4 +1,4 @@
-import { Camera, PackageOpen, Trash2, Undo2Icon, Upload } from "lucide-react";
+import { Camera, FilePlus, Trash2, Undo2Icon, Upload } from "lucide-react";
 import { ComponentProps, useEffect, useRef, useState } from "react"
 import { useFormContext } from "react-hook-form";
 import { Button } from "./button.js";
@@ -49,6 +49,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
     if (firstLoad.current || !filesProtected)
       return
 
+    // FIXME This causes autocancelation issues
     (async () => setFileToken(await pb.files.getToken()))()
     firstLoad.current = true
   }, [])
@@ -76,7 +77,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
     setFilesForRemoval(markedForRemoval);
 
     // Optionally, update the "attachments" field if needed
-    setValue(removeAttachmentsKey, Array.from(markedForRemoval).map((i) => existing_attachments[i]));
+    setValue(removeAttachmentsKey, Array.from(markedForRemoval).map((i) => existing_attachments[i]), { shouldDirty: true });
   };
 
   const existingFiles = <div>
@@ -149,7 +150,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
     setFiles(updatedFiles);
 
     // Update form state with the new file list
-    setValue(addAttachmentsKey, updatedFiles);
+    setValue(addAttachmentsKey, updatedFiles, { shouldDirty: true });
 
   };
 
@@ -163,8 +164,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
     setFiles(updatedFiles);
 
     // Update form state with the modified file list
-    setValue(addAttachmentsKey, updatedFiles);  // Adjust according to your form structure
-
+    setValue(addAttachmentsKey, updatedFiles, { shouldDirty: true });  // Adjust according to your form structure
   };
 
   const handleAddFiles = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,7 +177,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
       setFiles(updatedFiles);
 
       // Update form state with the new file list
-      setValue(addAttachmentsKey, updatedFiles);  // Adjust according to your form structure
+      setValue(addAttachmentsKey, updatedFiles, { shouldDirty: true });  // Adjust according to your form structure
     }
   };
 
@@ -241,8 +241,8 @@ export default function AttachmentEditor(props: AttachmentEditor) {
             {files.length}/{props.options?.maxFiles ?? "∞"} files {(Array.from(files).reduce((acc, file) => acc + file.size, 0) / (1024 * 1024)).toFixed(2)}/{props.options?.uploadSizeLimitMb ?? "∞"}MB
           </span>
         </div>
-        {files.length + existing_attachments.length < 1 && <label htmlFor={fieldId} className="cursor-pointer p-6">
-          <PackageOpen className="text-stone-300 m-auto" size={64} />
+        {files.length + existing_attachments.length < 1 && <label htmlFor={fieldId} className="cursor-pointer p-2">
+          <FilePlus className="text-stone-300 m-auto" size={64} />
         </label>}
         {existingFiles}
         <div>
