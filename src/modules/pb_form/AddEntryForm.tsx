@@ -2,19 +2,20 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z, ZodSchema } from "zod"
 import { Button } from "@/components/ui/button.js"
-import { Form } from "@/components/ui/form.js"
+import { Form, FormMessage } from "@/components/ui/form.js"
 import { getDefaultValuesFromZodFormMetadata, ZodFormMetadata } from "@/components/forms/zod_schema_helpers.js";
 import ZodFormField from "@/components/forms/ZodFormField.js";
 import { pb } from "@/settings.js"
 import { toast } from "react-toastify"
 
 import { ZodRawShape } from "zod";
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { RecordModel } from "pocketbase"
 import { useRouter, useCanGoBack, useBlocker } from "@tanstack/react-router"
 import { Loader2 } from "lucide-react"
 import { useMutation } from "@tanstack/react-query"
 import queryClient from "@/state/queryClient.js"
+import { getOrphanErrors, OrphanError, formBlocker } from "./utils.js"
 
 type AddEntryForm<T extends ZodRawShape> = {
     collection: string;
@@ -34,7 +35,7 @@ export default function AddEntryForm<T extends ZodRawShape>({ collection, formSc
         resolver: zodResolver(formSchema),
         defaultValues: getDefaultValuesFromZodFormMetadata(formMetaData, {}) as any,
     })
-
+    
     // When this mutation succeeds, invalidate any queries with the `todos` or `reminders` query key
     const mutation = useMutation({
         mutationFn: (values: Partial<RecordModel>) => pb.collection(collection).create(values),
@@ -43,10 +44,14 @@ export default function AddEntryForm<T extends ZodRawShape>({ collection, formSc
         },
     })
 
+    const [orphanErrors, setOrphanErrors] = useState<OrphanError[]>([])
+    
+    useEffect(() =>{
+        setOrphanErrors(getOrphanErrors(form.formState.errors, Object.keys(formMetaData)))
+    }, [form.formState.errors])
+
     useBlocker({
-        shouldBlockFn: () =>
-            form.formState.isDirty &&
-            !window.confirm("You have unsaved changes. \nAre you sure you want to leave? \nClick OK to discard changes or Cancel to stay."),
+        shouldBlockFn: formBlocker(form.formState.isDirty)
     })
 
     // 2. Define a submit handler.
@@ -90,6 +95,9 @@ export default function AddEntryForm<T extends ZodRawShape>({ collection, formSc
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 {Object.entries(formMetaData).map(([key, field]) => {
                     return <ZodFormField key={key} form={form} name={key} fieldMetaData={field} />
+                })}
+                {orphanErrors?.map((error) => {
+                    return <FormMessage key={error.name}><>{error.name}: {error.err?.message}</></FormMessage>
                 })}
                 {buttons}
             </form>

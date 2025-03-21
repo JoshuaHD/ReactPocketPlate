@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z, ZodSchema, ZodRawShape } from "zod"
+import { z, ZodSchema, ZodRawShape, isDirty } from "zod"
 import { Button } from "@/components/ui/button.js"
-import { Form } from "@/components/ui/form.js"
+import { Form, FormMessage } from "@/components/ui/form.js"
 import { getDefaultValuesFromZodFormMetadata, ZodFormMetadata } from "@/components/forms/zod_schema_helpers.js";
 import ZodFormField from "@/components/forms/ZodFormField.js";
 import { pb } from "@/settings.js"
@@ -13,6 +13,7 @@ import { useRouter, useCanGoBack, useBlocker } from "@tanstack/react-router"
 import { Loader2 } from "lucide-react"
 import queryClient, { getPbClients } from "@/state/queryClient.js"
 import { useMutation, useQuery } from "@tanstack/react-query"
+import { OrphanError, getOrphanErrors, formBlocker } from "./utils.js"
 
 type UpdateEntryForm<T extends ZodRawShape> = {
     recordId: string;
@@ -42,11 +43,14 @@ export default function UpdateEntryForm<T extends ZodRawShape>({ recordId, colle
         defaultValues: getDefaultValuesFromZodFormMetadata(formMetaData, data) as any,
     })
 
-    const isDirty = form.formState.isDirty
+    const [orphanErrors, setOrphanErrors] = useState<OrphanError[]>([])
+    
+    useEffect(() =>{
+        setOrphanErrors(getOrphanErrors(form.formState.errors, Object.keys(formMetaData)))
+    }, [form.formState.errors])
+
     useBlocker({
-        shouldBlockFn: () =>
-            isDirty &&
-            !window.confirm("You have unsaved changes. \nAre you sure you want to leave? \n\nClick OK to discard changes or Cancel to stay."),
+        shouldBlockFn: formBlocker(form.formState.isDirty)
     })
 
     // Reset form values when data is loaded
@@ -92,7 +96,9 @@ export default function UpdateEntryForm<T extends ZodRawShape>({ recordId, colle
                 {Object.entries(formMetaData).map(([key, field]) => {
                     return <ZodFormField key={key} form={form} name={key} fieldMetaData={field} />
                 })}
-
+                {orphanErrors?.map((error) => {
+                    return <FormMessage key={error.name}><>{error.name}: {error.err?.message}</></FormMessage>
+                })}
                 {buttons}
             </form>
         </Form>
