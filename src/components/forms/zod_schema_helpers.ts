@@ -5,7 +5,8 @@ import { z, ZodType } from "zod";
 export type ZodFormFieldMetaData<T> = {
     defaultValue?: T | ((data?: any, allData?: any, name?: any) => T),
     label?: string,
-    field?: Partial<HTMLInputElement> & {options?: any},
+    className?: string,
+    field?: Partial<HTMLInputElement> & any,
     component?: {
         component: ComponentType<any>,
         props?: (field: ComponentProps<ComponentType> & any, form?: UseFormReturn<any, any, undefined>) => ComponentProps<ComponentType>
@@ -33,11 +34,13 @@ export const getDefaultValuesFromZodFormMetadata = (formMetaData: ReturnType<typ
     for (let key in formMetaData) {
         const fieldKey = key // as keyof typeof notesCreateFormMetadata
 
-        if (formMetaData[fieldKey]?.defaultValue !== undefined) {
-            if (typeof formMetaData[fieldKey]?.defaultValue === 'function') {
-                defaultValues[fieldKey] = formMetaData[fieldKey]?.defaultValue(data?.[fieldKey], data, fieldKey)
+        const defaultValue = formMetaData[fieldKey]?.field?.defaultValue ?? formMetaData[fieldKey]?.defaultValue
+
+        if (defaultValue !== undefined) {
+            if (typeof defaultValue === 'function') {
+                defaultValues[fieldKey] = defaultValue(data?.[fieldKey], data, fieldKey)
             } else {
-                defaultValues[fieldKey] = data?.[fieldKey] ?? formMetaData[fieldKey]?.defaultValue;
+                defaultValues[fieldKey] = data?.[fieldKey] ?? defaultValue;
             }
         }
     }

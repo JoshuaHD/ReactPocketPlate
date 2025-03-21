@@ -26,12 +26,12 @@ export default function <TSchema extends z.ZodObject<any>>({ form, fieldMetaData
             render={({ field }) => {
                 const label = fieldMetaData.label ?? name
                 const additionalProps = (typeof fieldMetaData.component?.props === 'function') ? fieldMetaData.component.props(field, form) : {}
-                const fieldProps: ComponentProps<typeof Component> = {...fieldMetaData.field, ...additionalProps}
+                const fieldProps: ComponentProps<typeof Component> = { ...fieldMetaData.field, ...additionalProps }
 
-                if(fieldProps.type === "hidden")
+                if (fieldProps.type === "hidden")
                     return <><Component {...form.register(name)} {...fieldProps} /><FormMessage /></>
-                    
-                return <FormItem>
+
+                return <FormItem className={`col-span-12 ${fieldMetaData.className ?? ""}`}>
                     {label && <FormLabel>{label}</FormLabel>}
                     <FormControl>
                         <Component {...form.register(name)} {...fieldProps} />
