@@ -22,16 +22,22 @@ export const getOrphanErrors = (errors: FieldErrors, fields: string[]): OrphanEr
 }
 
 export const formBlocker = (isDirty: boolean) => () => {
+    const formBlockerToastId = "form-blocker-toast"
     const DONT_BLOCK_NAVIGATION = false;
     const BLOCK_NAVIGATION = true;
   
     if (!isDirty)
         return DONT_BLOCK_NAVIGATION
   
+    
+    if(toast.isActive(formBlockerToastId))
+        return BLOCK_NAVIGATION
+
     const shouldBlock = new Promise<boolean>((resolve) => {
         // Using a modal manager of your choice
         const notify = () => {
-            toast.warn(FormBlockerToast, {
+            toast(FormBlockerToast, {
+                toastId: formBlockerToastId,
                 autoClose: false, // Make sure the toast doesn't auto-close
                 closeButton: false, // Remove the close button
                 closeOnClick: false,
@@ -41,6 +47,7 @@ export const formBlocker = (isDirty: boolean) => () => {
                     
                     return resolve(DONT_BLOCK_NAVIGATION)
                 },
+                theme: "colored"
             });
         };
   
