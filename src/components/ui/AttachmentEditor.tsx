@@ -53,6 +53,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
     (async () => setFileToken(await pb.files.getToken()))()
     firstLoad.current = true
   }, [])
+
   useEffect(() => {
     setFiles([])
   }, [key])
@@ -115,6 +116,29 @@ export default function AttachmentEditor(props: AttachmentEditor) {
   </div>
 
   // UPLOAD
+  const handlePaste = (event: ClipboardEvent|any) => {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+
+    const pastedFiles: File[] = [];
+    for (const item of items) {
+      if (allowedFileTypes?.includes(item.type)) {
+        const file = item.getAsFile();
+        if (file) pastedFiles.push(file);
+      } else {
+        setError(errorMessageIllegalFiletype);
+        
+        setDebouncedError("", 1000);
+      }
+    }
+
+    const updatedFiles = [...files, ...pastedFiles];
+    setFiles(updatedFiles);
+
+    // Update form state with the new file list
+    setValue(addAttachmentsKey, updatedFiles, { shouldDirty: true });
+
+  };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -200,6 +224,11 @@ export default function AttachmentEditor(props: AttachmentEditor) {
     return true
   }
 
+  const handleOpenFile = (file: File) => {
+    const objectURL = URL.createObjectURL(file);
+    window.open(objectURL, "_blank");
+  };
+
   const newFile = (file: any, index: number) => {
     const state = ""
 
@@ -219,7 +248,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
       </div></div>
     }
     return <div key={index} className={`py-2 ${(index !== 0 || existing_attachments.length > 0) ? "border-t border-gray-300" : ""}`}>
-      <div data-state={state} className="data-[state=trashed]:line-through data-[state=trashed]:text-red-400 flex items-center">
+      <div data-state={state} className="data-[state=trashed]:line-through data-[state=trashed]:text-red-400 flex items-center cursor-pointer" onClick={() => handleOpenFile(file)}>
         {icon}
         <span className="break-all flex-1 pl-2 text-left"><Badge className="bg-emerald-500">new</Badge> {file.name}</span>
 
@@ -230,13 +259,16 @@ export default function AttachmentEditor(props: AttachmentEditor) {
   return (
     <div>
       <div
+        aria-invalid={!!error}
+        tabIndex={0}
+        onPaste={handlePaste}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`border  p-2 rounded-md transition ${(error) ? "border-red-500 bg-red-100" : (isDragging ? "border-green-500 bg-green-100 cursor-pointer" : "border-gray-400")}`}
+        className={`border-input selection:bg-primary selection:text-primary-foreground border ${(error) ? "bg-red-100" : (isDragging ? "border-green-500 bg-green-100 cursor-pointer" : "border-gray-400")} shadow-xs transition-[color,box-shadow] outline-none p-2 rounded-md focus:border-ring focus:ring-ring/50 focus:ring-[3px] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive`}
       >
         <div className="flex justify-between items-center">
-          <p>{error || "Drag & Drop Files here"}</p>
+          <p aria-invalid={!!error} className={`aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive`}>{error || "Paste or Drag & Drop files here"}</p>
           <span className="text-xs">
             {files.length}/{props.options?.maxFiles ?? "∞"} files {(Array.from(files).reduce((acc, file) => acc + file.size, 0) / (1024 * 1024)).toFixed(2)}/{props.options?.uploadSizeLimitMb ?? "∞"}MB
           </span>
