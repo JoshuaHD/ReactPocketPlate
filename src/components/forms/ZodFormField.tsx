@@ -25,7 +25,7 @@ export default function <TSchema extends z.ZodObject<any>>({ form, fieldMetaData
             name={name}
             render={({ field }) => {
                 const label = fieldMetaData.label ?? name
-                const additionalProps = (typeof fieldMetaData.component?.props === 'function') ? fieldMetaData.component.props(field, form) : {}
+                const additionalProps = (typeof fieldMetaData.component?.props === 'function') ? fieldMetaData.component.props(field, form) : ((fieldMetaData.component?.component) ? field : {})
                 const fieldProps: ComponentProps<typeof Component> = { ...fieldMetaData.field, ...additionalProps }
 
                 if (fieldProps.type === "hidden")
