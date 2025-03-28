@@ -1,18 +1,8 @@
+import { test_pages } from '@/_dev/pb_pages.js'
 import { Pages } from './types.js'
 
 const pages: Pages = {
-/* example page:
-
-    notes: {
-        collection: notes.collection,
-        queryOptions: notes.queryOptions,
-        listEntriesProps: notes.listEntriesProps,
-        formCreateSchema: notes.formCreateSchema,
-        formCreateMetadata: notes.formCreateMetadata,
-        formUpdateSchema: notes.formUpdateSchema,
-        formUpdateMetadata: notes.formUpdateMetadata,
-    }
-*/
+    ...test_pages, // THIS OBJECT IS EMPTY IN MASTER USE IT IN FEATURE BRANCHES TO TEST PAGES
 }
   
 export default pages
