@@ -1,1 +1,2 @@
 src/_dev/* merge=ours
+src/routes/(test)/* merge=ours
