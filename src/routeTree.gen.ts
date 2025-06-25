@@ -19,6 +19,12 @@ import { Route as UserLogoutImport } from './routes/user/logout'
 import { Route as UserLoginImport } from './routes/user/login'
 import { Route as UserChangepasswordImport } from './routes/user/change_password'
 import { Route as UserAccessdeniedImport } from './routes/user/access_denied'
+import { Route as pbCollectionRouteImport } from './routes/(pb)/$collection/route'
+import { Route as pbCollectionIndexImport } from './routes/(pb)/$collection/index'
+import { Route as pbCollectionNewImport } from './routes/(pb)/$collection/new'
+import { Route as pbCollectionRecordIdImport } from './routes/(pb)/$collection/$recordId'
+import { Route as pbCollectionRecordIdEditImport } from './routes/(pb)/$collection/$recordId_.edit'
+import { Route as pbCollectionRecordIdDeleteImport } from './routes/(pb)/$collection/$recordId_.delete'
 
 // Create/Update Routes
 
@@ -70,6 +76,44 @@ const UserAccessdeniedRoute = UserAccessdeniedImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const pbCollectionRouteRoute = pbCollectionRouteImport.update({
+  id: '/(pb)/$collection',
+  path: '/$collection',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const pbCollectionIndexRoute = pbCollectionIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => pbCollectionRouteRoute,
+} as any)
+
+const pbCollectionNewRoute = pbCollectionNewImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => pbCollectionRouteRoute,
+} as any)
+
+const pbCollectionRecordIdRoute = pbCollectionRecordIdImport.update({
+  id: '/$recordId',
+  path: '/$recordId',
+  getParentRoute: () => pbCollectionRouteRoute,
+} as any)
+
+const pbCollectionRecordIdEditRoute = pbCollectionRecordIdEditImport.update({
+  id: '/$recordId_/edit',
+  path: '/$recordId/edit',
+  getParentRoute: () => pbCollectionRouteRoute,
+} as any)
+
+const pbCollectionRecordIdDeleteRoute = pbCollectionRecordIdDeleteImport.update(
+  {
+    id: '/$recordId_/delete',
+    path: '/$recordId/delete',
+    getParentRoute: () => pbCollectionRouteRoute,
+  } as any,
+)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -79,6 +123,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/(pb)/$collection': {
+      id: '/(pb)/$collection'
+      path: '/$collection'
+      fullPath: '/$collection'
+      preLoaderRoute: typeof pbCollectionRouteImport
       parentRoute: typeof rootRoute
     }
     '/user/access_denied': {
@@ -130,13 +181,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserIndexImport
       parentRoute: typeof rootRoute
     }
+    '/(pb)/$collection/$recordId': {
+      id: '/(pb)/$collection/$recordId'
+      path: '/$recordId'
+      fullPath: '/$collection/$recordId'
+      preLoaderRoute: typeof pbCollectionRecordIdImport
+      parentRoute: typeof pbCollectionRouteImport
+    }
+    '/(pb)/$collection/new': {
+      id: '/(pb)/$collection/new'
+      path: '/new'
+      fullPath: '/$collection/new'
+      preLoaderRoute: typeof pbCollectionNewImport
+      parentRoute: typeof pbCollectionRouteImport
+    }
+    '/(pb)/$collection/': {
+      id: '/(pb)/$collection/'
+      path: '/'
+      fullPath: '/$collection/'
+      preLoaderRoute: typeof pbCollectionIndexImport
+      parentRoute: typeof pbCollectionRouteImport
+    }
+    '/(pb)/$collection/$recordId_/delete': {
+      id: '/(pb)/$collection/$recordId_/delete'
+      path: '/$recordId/delete'
+      fullPath: '/$collection/$recordId/delete'
+      preLoaderRoute: typeof pbCollectionRecordIdDeleteImport
+      parentRoute: typeof pbCollectionRouteImport
+    }
+    '/(pb)/$collection/$recordId_/edit': {
+      id: '/(pb)/$collection/$recordId_/edit'
+      path: '/$recordId/edit'
+      fullPath: '/$collection/$recordId/edit'
+      preLoaderRoute: typeof pbCollectionRecordIdEditImport
+      parentRoute: typeof pbCollectionRouteImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface pbCollectionRouteRouteChildren {
+  pbCollectionRecordIdRoute: typeof pbCollectionRecordIdRoute
+  pbCollectionNewRoute: typeof pbCollectionNewRoute
+  pbCollectionIndexRoute: typeof pbCollectionIndexRoute
+  pbCollectionRecordIdDeleteRoute: typeof pbCollectionRecordIdDeleteRoute
+  pbCollectionRecordIdEditRoute: typeof pbCollectionRecordIdEditRoute
+}
+
+const pbCollectionRouteRouteChildren: pbCollectionRouteRouteChildren = {
+  pbCollectionRecordIdRoute: pbCollectionRecordIdRoute,
+  pbCollectionNewRoute: pbCollectionNewRoute,
+  pbCollectionIndexRoute: pbCollectionIndexRoute,
+  pbCollectionRecordIdDeleteRoute: pbCollectionRecordIdDeleteRoute,
+  pbCollectionRecordIdEditRoute: pbCollectionRecordIdEditRoute,
+}
+
+const pbCollectionRouteRouteWithChildren =
+  pbCollectionRouteRoute._addFileChildren(pbCollectionRouteRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$collection': typeof pbCollectionRouteRouteWithChildren
   '/user/access_denied': typeof UserAccessdeniedRoute
   '/user/change_password': typeof UserChangepasswordRoute
   '/user/login': typeof UserLoginRoute
@@ -144,6 +250,11 @@ export interface FileRoutesByFullPath {
   '/user/password_forgotten': typeof UserPasswordforgottenRoute
   '/user/profile': typeof UserProfileRoute
   '/user': typeof UserIndexRoute
+  '/$collection/$recordId': typeof pbCollectionRecordIdRoute
+  '/$collection/new': typeof pbCollectionNewRoute
+  '/$collection/': typeof pbCollectionIndexRoute
+  '/$collection/$recordId/delete': typeof pbCollectionRecordIdDeleteRoute
+  '/$collection/$recordId/edit': typeof pbCollectionRecordIdEditRoute
 }
 
 export interface FileRoutesByTo {
@@ -155,11 +266,17 @@ export interface FileRoutesByTo {
   '/user/password_forgotten': typeof UserPasswordforgottenRoute
   '/user/profile': typeof UserProfileRoute
   '/user': typeof UserIndexRoute
+  '/$collection/$recordId': typeof pbCollectionRecordIdRoute
+  '/$collection/new': typeof pbCollectionNewRoute
+  '/$collection': typeof pbCollectionIndexRoute
+  '/$collection/$recordId/delete': typeof pbCollectionRecordIdDeleteRoute
+  '/$collection/$recordId/edit': typeof pbCollectionRecordIdEditRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/(pb)/$collection': typeof pbCollectionRouteRouteWithChildren
   '/user/access_denied': typeof UserAccessdeniedRoute
   '/user/change_password': typeof UserChangepasswordRoute
   '/user/login': typeof UserLoginRoute
@@ -167,12 +284,18 @@ export interface FileRoutesById {
   '/user/password_forgotten': typeof UserPasswordforgottenRoute
   '/user/profile': typeof UserProfileRoute
   '/user/': typeof UserIndexRoute
+  '/(pb)/$collection/$recordId': typeof pbCollectionRecordIdRoute
+  '/(pb)/$collection/new': typeof pbCollectionNewRoute
+  '/(pb)/$collection/': typeof pbCollectionIndexRoute
+  '/(pb)/$collection/$recordId_/delete': typeof pbCollectionRecordIdDeleteRoute
+  '/(pb)/$collection/$recordId_/edit': typeof pbCollectionRecordIdEditRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$collection'
     | '/user/access_denied'
     | '/user/change_password'
     | '/user/login'
@@ -180,6 +303,11 @@ export interface FileRouteTypes {
     | '/user/password_forgotten'
     | '/user/profile'
     | '/user'
+    | '/$collection/$recordId'
+    | '/$collection/new'
+    | '/$collection/'
+    | '/$collection/$recordId/delete'
+    | '/$collection/$recordId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -190,9 +318,15 @@ export interface FileRouteTypes {
     | '/user/password_forgotten'
     | '/user/profile'
     | '/user'
+    | '/$collection/$recordId'
+    | '/$collection/new'
+    | '/$collection'
+    | '/$collection/$recordId/delete'
+    | '/$collection/$recordId/edit'
   id:
     | '__root__'
     | '/'
+    | '/(pb)/$collection'
     | '/user/access_denied'
     | '/user/change_password'
     | '/user/login'
@@ -200,11 +334,17 @@ export interface FileRouteTypes {
     | '/user/password_forgotten'
     | '/user/profile'
     | '/user/'
+    | '/(pb)/$collection/$recordId'
+    | '/(pb)/$collection/new'
+    | '/(pb)/$collection/'
+    | '/(pb)/$collection/$recordId_/delete'
+    | '/(pb)/$collection/$recordId_/edit'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  pbCollectionRouteRoute: typeof pbCollectionRouteRouteWithChildren
   UserAccessdeniedRoute: typeof UserAccessdeniedRoute
   UserChangepasswordRoute: typeof UserChangepasswordRoute
   UserLoginRoute: typeof UserLoginRoute
@@ -216,6 +356,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  pbCollectionRouteRoute: pbCollectionRouteRouteWithChildren,
   UserAccessdeniedRoute: UserAccessdeniedRoute,
   UserChangepasswordRoute: UserChangepasswordRoute,
   UserLoginRoute: UserLoginRoute,
@@ -236,6 +377,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/(pb)/$collection",
         "/user/access_denied",
         "/user/change_password",
         "/user/login",
@@ -247,6 +389,16 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/(pb)/$collection": {
+      "filePath": "(pb)/$collection/route.tsx",
+      "children": [
+        "/(pb)/$collection/$recordId",
+        "/(pb)/$collection/new",
+        "/(pb)/$collection/",
+        "/(pb)/$collection/$recordId_/delete",
+        "/(pb)/$collection/$recordId_/edit"
+      ]
     },
     "/user/access_denied": {
       "filePath": "user/access_denied.tsx"
@@ -268,6 +420,26 @@ export const routeTree = rootRoute
     },
     "/user/": {
       "filePath": "user/index.tsx"
+    },
+    "/(pb)/$collection/$recordId": {
+      "filePath": "(pb)/$collection/$recordId.tsx",
+      "parent": "/(pb)/$collection"
+    },
+    "/(pb)/$collection/new": {
+      "filePath": "(pb)/$collection/new.tsx",
+      "parent": "/(pb)/$collection"
+    },
+    "/(pb)/$collection/": {
+      "filePath": "(pb)/$collection/index.tsx",
+      "parent": "/(pb)/$collection"
+    },
+    "/(pb)/$collection/$recordId_/delete": {
+      "filePath": "(pb)/$collection/$recordId_.delete.tsx",
+      "parent": "/(pb)/$collection"
+    },
+    "/(pb)/$collection/$recordId_/edit": {
+      "filePath": "(pb)/$collection/$recordId_.edit.tsx",
+      "parent": "/(pb)/$collection"
     }
   }
 }
