@@ -13,9 +13,6 @@ export const Route = createRootRoute({
         <TanstackLink to="/" className="[&.active]:font-bold">
           Home
         </TanstackLink>{' '}
-        <TanstackLink to="/user" className="[&.active]:font-bold">
-          User
-        </TanstackLink>{' '}
 
         {
           /*
