@@ -30,7 +30,7 @@ const RadioGroupFormField = (props: RadioGroupFormField & ComponentProps<typeof 
     return <RadioGroup
         onValueChange={props.onChange as typeof props.onValueChange}
         onChange={props.onChange}
-        defaultValue={props.value}
+        value={props.value}
         className={style}
     >
         {props.options.map((option: RadioGroupOption, i: number) => {

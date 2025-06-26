@@ -31,20 +31,50 @@ export function createZodFormMetadata<T extends ZodType<any>>(_schema: T): ZodFo
 export const getDefaultValuesFromZodFormMetadata = (formMetaData: ReturnType<typeof createZodFormMetadata>, data?: Record<string, any>) => {
     let defaultValues: Record<string, any> = {}; // Ensure it's an object with string keys
 
-    for (let key in formMetaData) {
-        const fieldKey = key // as keyof typeof notesCreateFormMetadata
-
-        const defaultValue = formMetaData[fieldKey]?.field?.defaultValue ?? formMetaData[fieldKey]?.defaultValue
-
-        if (defaultValue !== undefined) {
-            if (typeof defaultValue === 'function') {
-                defaultValues[fieldKey] = defaultValue(data?.[fieldKey], data, fieldKey)
-            } else {
-                defaultValues[fieldKey] = data?.[fieldKey] ?? defaultValue;
-            }
+    for (const key in formMetaData) {
+        const meta = formMetaData[key];
+        let defaultValue = meta?.field?.defaultValue ?? meta?.defaultValue;
+    
+        if (typeof defaultValue === "function") {
+          // call with (currentDataValue, fullData, fieldKey)
+          defaultValues[key] = defaultValue(data?.[key], data, key);
+          continue;
         }
-    }
-
-    return defaultValues;
+    
+        if (data && key in data) {
+          // Important: include falsy values by using 'key in data'
+          defaultValues[key] = data[key];
+          continue;
+        }
+    
+        if (defaultValue !== undefined) {
+          defaultValues[key] = defaultValue;
+          continue;
+        }
+    
+        // Fallback by type inference — customize per your metadata or schema type info
+        const type = meta?.field?.type ?? typeof data?.[key];
+        switch (type) {
+          case "string":
+            defaultValues[key] = "";
+            break;
+          case "number":
+            defaultValues[key] = 0;
+            break;
+          case "boolean":
+            defaultValues[key] = false;
+            break;
+          case "object":
+            defaultValues[key] = {}; // Or null, if you prefer
+            break;
+          case "array":
+            defaultValues[key] = [];
+            break;
+          default:
+            defaultValues[key] = null; // safest fallback
+        }
+      }
+    
+      return defaultValues;
 };
 
