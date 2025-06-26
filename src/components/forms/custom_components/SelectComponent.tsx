@@ -26,7 +26,7 @@ export function SelectFormField(props: SelectFormField & ComponentProps<typeof S
 
     return <Select
         onValueChange={props.onChange as typeof props.onValueChange}
-        defaultValue={props.value}
+        value={props.value}
         >
         <FormControl className={props.className ?? "w-full"}>
             <SelectTrigger>

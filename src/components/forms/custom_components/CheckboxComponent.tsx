@@ -6,7 +6,7 @@ const CheckboxComponent = {
     props: (field: ComponentProps<typeof Checkbox>) => {
         //field.checked = field.value
         field.onCheckedChange = field.onChange as any
-        field.defaultChecked = field.value as unknown as boolean
+        field.checked = field.value as unknown as boolean
         return field
     },
 }

@@ -65,11 +65,12 @@ export default function AddEntryForm<T extends ZodRawShape>({ collection, formSc
                     hideProgressBar: false,
                     autoClose: 1000
                 });
-                setFormId(new Date().getTime())
             }
 
             if (action === "new") {
                 resetForm()
+                
+                setFormId(new Date().getTime())
             } else {
                 resetForm()
                 if (typeof onSuccess === "function")
