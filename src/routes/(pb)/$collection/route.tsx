@@ -31,7 +31,7 @@ export const Route = createFileRoute('/(pb)/$collection')({
 
     protectPage(location)
 
-    const context: PbRouteLoaderContext = {collection_settings, collection: params.collection}
+    const context: PbRouteLoaderContext = {collection_settings, collection: collection_settings.collection || params.collection}
 
     return context
   },
