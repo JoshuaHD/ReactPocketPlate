@@ -1,5 +1,5 @@
 import { Camera, FilePlus, Trash2, Undo2Icon, Upload } from "lucide-react";
-import { ComponentProps, useEffect, useRef, useState } from "react"
+import { ComponentProps, useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { useFormContext } from "react-hook-form";
 import { Button } from "./button.js";
 import { FileIcon, defaultStyles, DefaultExtensionType } from 'react-file-icon';
@@ -24,6 +24,25 @@ const previewExtensions = [
 
 const errorMessageIllegalFiletype = "Filetype not allowed"
 
+function useIsSmallTouchDevice() {
+  return useSyncExternalStore(
+    (callback) => {
+      const mql = window.matchMedia("(pointer: coarse) and (max-width: 1024px)");
+
+      if (mql.addEventListener) {
+        mql.addEventListener("change", callback);
+        return () => mql.removeEventListener("change", callback);
+      } else {
+        mql.addListener(callback);
+        return () => mql.removeListener(callback);
+      }
+    },
+    () => window.matchMedia("(pointer: coarse) and (max-width: 1024px)").matches,
+    () => false // SSR fallback
+  );
+}
+
+
 export default function AttachmentEditor(props: AttachmentEditor) {
   const { allowedFileTypes, filesProtected } = props.options ?? {}
   const firstLoad = useRef(false)
@@ -38,6 +57,11 @@ export default function AttachmentEditor(props: AttachmentEditor) {
   const removeAttachmentsKey = `${field}-`
   const addAttachmentsKey = `${field}+`
 
+  const isSmallTouchDevice = useIsSmallTouchDevice()
+
+  const showCameraButton = (() => {
+    return isSmallTouchDevice && allowedFileTypes?.find(t => t.startsWith("image/") || t.startsWith("video"))
+  })()
   const [filesForRemoval, setFilesForRemoval] = useState<Set<number>>(new Set());
   const [files, setFiles] = useState<File[]>([]);
 
@@ -267,15 +291,16 @@ export default function AttachmentEditor(props: AttachmentEditor) {
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`border-input selection:bg-primary selection:text-primary-foreground border ${(error) ? "bg-red-100" : (isDragging ? "border-green-500 bg-green-100 cursor-pointer" : "border-gray-400")} shadow-xs transition-[color,box-shadow] outline-none p-2 rounded-md focus:border-ring focus:ring-ring/50 focus:ring-[3px] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive`}
+        data-no-focus-ring={isSmallTouchDevice}
+        className={`border-input selection:bg-primary selection:text-primary-foreground border ${(error) ? "bg-red-100" : (isDragging ? "border-green-500 bg-green-100 cursor-pointer" : "border-gray-400")} shadow-xs transition-[color,box-shadow] outline-none p-2 rounded-md focus:border-ring focus:ring-ring/50 focus:ring-[3px] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive data-[no-focus-ring=true]:focus:ring-0 data-[no-focus-ring=true]:focus-visible:ring-0`}
       >
         <div className="flex justify-between items-center">
-          <p aria-invalid={!!error} className={`aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive`}>{error || "Paste or Drag & Drop files here"}</p>
+          {(isSmallTouchDevice) ? <p></p> : <p aria-invalid={!!error} className={`aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive`}>{error || "Paste or Drag & Drop files here"}</p>}
           <span className="text-xs">
             {files.length + existing_attachments.length - filesForRemoval.size}/{props.options?.maxFiles ?? "∞"} files {(Array.from(files).reduce((acc, file) => acc + file.size, 0) / (1024 * 1024)).toFixed(2)}/{props.options?.uploadSizeLimitMb ?? "∞"}MB
           </span>
         </div>
-        {files.length + existing_attachments.length < 1 && <label htmlFor={fieldId} className="cursor-pointer p-2">
+        {!isSmallTouchDevice && files.length + existing_attachments.length < 1 && <label htmlFor={fieldId} className="cursor-pointer p-2">
           <FilePlus className="text-stone-300 m-auto" size={64} />
         </label>}
         {existingFiles}
@@ -286,7 +311,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
         </div>
 
         <div className="flex items-center justify-end">
-          <div>
+          {showCameraButton && <div>
             <input
               type="file"
               id="cameraInput"
@@ -301,9 +326,9 @@ export default function AttachmentEditor(props: AttachmentEditor) {
               className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-accent"
             >
               <Camera size={18} />
-              Take Foto
+              Open Camera
             </label>
-          </div>
+          </div>}
           <div>
             <input
               type="file"
