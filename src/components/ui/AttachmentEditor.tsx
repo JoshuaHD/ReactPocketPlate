@@ -117,7 +117,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
   </div>
 
   // UPLOAD
-  const handlePaste = (event: ClipboardEvent|any) => {
+  const handlePaste = (event: ClipboardEvent | any) => {
     const items = event.clipboardData?.items;
     if (!items) return;
 
@@ -128,7 +128,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
         if (file) pastedFiles.push(file);
       } else {
         setError(errorMessageIllegalFiletype);
-        
+
         setDebouncedError("", 1000);
       }
     }
