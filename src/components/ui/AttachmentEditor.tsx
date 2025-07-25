@@ -32,7 +32,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
 
   const { watch, setValue, formState } = useFormContext();
   const { dataset, field, key } = watch(props.name!); // Get the current value of the "attachments" field
-  const existing_attachments = (typeof dataset?.[field] === "string") ? [dataset?.[field]] : (dataset?.[field] ?? [])
+  const existing_attachments = (dataset?.[field] && typeof dataset?.[field] === "string") ? [dataset?.[field]] : (dataset?.[field] ?? [])
   const fieldId = props?.id
 
   const removeAttachmentsKey = `${field}-`
