@@ -8,6 +8,7 @@ import { Badge } from "./badge.js";
 import { FormMessage } from "./form.js";
 
 export type AttachmentEditorOptions = {
+  db_field_name: string,
   uploadSizeLimitMb?: number,
   maxFiles?: number,
   allowedFileTypes?: string[],

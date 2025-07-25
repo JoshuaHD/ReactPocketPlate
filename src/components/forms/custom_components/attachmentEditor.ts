@@ -102,18 +102,20 @@ export function getAttachmentEditorSchema (filesFieldName: string, label: string
         component: {
             component: AttachmentEditor,
             props: (field: ComponentProps<typeof AttachmentEditor>) => {
-                field.options = options ?? {}
+                field.options = options ?? {} as AttachmentEditorOptions
                 return field as any
             }
         }   
     }
 }
 
-export const getAttachmentZodSchema = (options?: AttachmentEditorOptions) => {
+export const getAttachmentZodSchema = (options?: AttachmentEditorOptions) => { 
+  options = options ?? {} as AttachmentEditorOptions
+  const defaultFieldName = "attachments"
   return {
-    "_attachments": z.any(),//.transform(() => undefined),
-    "attachments-": z.array(z.string()).transform((val) => (val.length < 1 ? undefined : val)).optional(), // array to remove files
-    "attachments+": getFileUploadFieldsZodSchema(options ?? {}).optional(),
+    ["_" + options?.db_field_name ?? defaultFieldName]: z.any(),//.transform(() => undefined),
+    [options?.db_field_name ?? defaultFieldName + "-"]: z.array(z.string()).transform((val) => (val.length < 1 ? undefined : val)).optional(), // array to remove files
+    [options?.db_field_name?? defaultFieldName + "+"]: getFileUploadFieldsZodSchema(options).optional(),
 }
 }
 
