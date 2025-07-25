@@ -93,28 +93,30 @@ export const allowedFileTypePresets = {
  * console.log(schema);
  */
 
-export function getAttachmentEditorSchema (filesFieldName: string, label: string, options?: AttachmentEditorOptions): any {
-    return {
-        defaultValue: (_: any, allData: any) => {
-            return {dataset: allData, field: filesFieldName, key: new Date().getTime()}
-        },
-        label,   
-        component: {
-            component: AttachmentEditor,
-            props: (field: ComponentProps<typeof AttachmentEditor>) => {
-                field.options = options ?? {}
-                return field as any
-            }
-        }   
+export function getAttachmentEditorSchema(filesFieldName: string, label: string, options?: AttachmentEditorOptions): any {
+  return {
+    defaultValue: (_: any, allData: any) => {
+      return { dataset: allData, field: filesFieldName, key: new Date().getTime() }
+    },
+    label,
+    component: {
+      component: AttachmentEditor,
+      props: (field: ComponentProps<typeof AttachmentEditor>) => {
+        field.options = options ?? {} as AttachmentEditorOptions
+        return field as any
+      }
     }
+  }
 }
 
 export const getAttachmentZodSchema = (options?: AttachmentEditorOptions) => {
+  options = options ?? {} as AttachmentEditorOptions
+  const defaultFieldName = "attachments"
   return {
-    "_attachments": z.any(),//.transform(() => undefined),
-    "attachments-": z.array(z.string()).transform((val) => (val.length < 1 ? undefined : val)).optional(), // array to remove files
-    "attachments+": getFileUploadFieldsZodSchema(options ?? {}).optional(),
-}
+    ["_" + (options?.db_field_name ?? defaultFieldName)]: z.any(),//.transform(() => undefined),
+    [(options?.db_field_name ?? defaultFieldName) + "-"]: z.array(z.string()).transform((val) => (val.length < 1 ? undefined : val)).optional(), // array to remove files
+    [(options?.db_field_name ?? defaultFieldName) + "+"]: getFileUploadFieldsZodSchema(options).optional(),
+  }
 }
 
 const getFileUploadFieldsZodSchema = ({ uploadSizeLimitMb, maxFiles, allowedFileTypes }: AttachmentEditorOptions) => {
@@ -123,42 +125,42 @@ const getFileUploadFieldsZodSchema = ({ uploadSizeLimitMb, maxFiles, allowedFile
   let fileArraySchema: any = z.array(z.instanceof(File));
 
   // Apply refiners based on the passed arguments
-  if (maxFiles ) {
+  if (maxFiles) {
     const fileNumberRefiner = (files: FileList | File[] | unknown[]) => {
       return files.length <= maxFiles
     }
     const fileNumberRefinerMessage = (files: FileList | File[] | unknown[]) => ({ message: `You can upload up to ${maxFiles} files only (got ${Array.from(files).length})` })
 
-    fileListSchema =  fileListSchema.refine(fileNumberRefiner, fileNumberRefinerMessage);
+    fileListSchema = fileListSchema.refine(fileNumberRefiner, fileNumberRefinerMessage);
     fileArraySchema = fileArraySchema.refine(fileNumberRefiner, fileNumberRefinerMessage);
   }
 
   if (uploadSizeLimitMb) {
     const fileSizeRefiner = (files: FileList | File[] | any[]) => Array.from(files).reduce((acc, file) => acc + file.size, 0) <= uploadSizeLimitMb * 1024 * 1024
-    const fileSizeRefinerMessage = (files: FileList | File[]| any[]) => ({ message: `Total file size should not exceed ${Math.round(uploadSizeLimitMb * 100) / 100}MB (${(Array.from(files).reduce((acc, file) => acc + file.size, 0) / (1024 * 1024)).toFixed(2)}MB Selected)` })
+    const fileSizeRefinerMessage = (files: FileList | File[] | any[]) => ({ message: `Total file size should not exceed ${Math.round(uploadSizeLimitMb * 100) / 100}MB (${(Array.from(files).reduce((acc, file) => acc + file.size, 0) / (1024 * 1024)).toFixed(2)}MB Selected)` })
 
-    fileListSchema =  fileListSchema.refine(fileSizeRefiner, fileSizeRefinerMessage);
+    fileListSchema = fileListSchema.refine(fileSizeRefiner, fileSizeRefinerMessage);
     fileArraySchema = fileArraySchema.refine(fileSizeRefiner, fileSizeRefinerMessage);
   }
 
   if (allowedFileTypes && allowedFileTypes.length > 0) {
-    const fileTypeRefiner = (files: FileList | File[] | any[]) =>{
-        return Array.from(files).every((file) =>
-            allowedFileTypes.includes(
-                file.type
-            )
+    const fileTypeRefiner = (files: FileList | File[] | any[]) => {
+      return Array.from(files).every((file) =>
+        allowedFileTypes.includes(
+          file.type
         )
+      )
     }
     const fileTypeRefinerMessage = (files: FileList | File[] | any[]) => {
-        const invalidFiles = Array.from(files)
-            .filter((file) => !allowedFileTypes.includes(file.type))
-            .map((file) => file.type)
-            .join(", ");
+      const invalidFiles = Array.from(files)
+        .filter((file) => !allowedFileTypes.includes(file.type))
+        .map((file) => file.type)
+        .join(", ");
 
-        return { message: `Invalid file type(s): ${invalidFiles}` };
+      return { message: `Invalid file type(s): ${invalidFiles}` };
     }
 
-    fileListSchema =  fileListSchema.refine(fileTypeRefiner, fileTypeRefinerMessage);
+    fileListSchema = fileListSchema.refine(fileTypeRefiner, fileTypeRefinerMessage);
     fileArraySchema = fileArraySchema.refine(fileTypeRefiner, fileTypeRefinerMessage);
   }
 

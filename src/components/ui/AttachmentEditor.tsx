@@ -1,5 +1,5 @@
 import { Camera, FilePlus, Trash2, Undo2Icon, Upload } from "lucide-react";
-import { ComponentProps, useEffect, useRef, useState } from "react"
+import { ComponentProps, useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { useFormContext } from "react-hook-form";
 import { Button } from "./button.js";
 import { FileIcon, defaultStyles, DefaultExtensionType } from 'react-file-icon';
@@ -8,6 +8,7 @@ import { Badge } from "./badge.js";
 import { FormMessage } from "./form.js";
 
 export type AttachmentEditorOptions = {
+  db_field_name: string,
   uploadSizeLimitMb?: number,
   maxFiles?: number,
   allowedFileTypes?: string[],
@@ -23,6 +24,25 @@ const previewExtensions = [
 
 const errorMessageIllegalFiletype = "Filetype not allowed"
 
+function useIsSmallTouchDevice() {
+  return useSyncExternalStore(
+    (callback) => {
+      const mql = window.matchMedia("(pointer: coarse) and (max-width: 1024px)");
+
+      if (mql.addEventListener) {
+        mql.addEventListener("change", callback);
+        return () => mql.removeEventListener("change", callback);
+      } else {
+        mql.addListener(callback);
+        return () => mql.removeListener(callback);
+      }
+    },
+    () => window.matchMedia("(pointer: coarse) and (max-width: 1024px)").matches,
+    () => false // SSR fallback
+  );
+}
+
+
 export default function AttachmentEditor(props: AttachmentEditor) {
   const { allowedFileTypes, filesProtected } = props.options ?? {}
   const firstLoad = useRef(false)
@@ -31,12 +51,17 @@ export default function AttachmentEditor(props: AttachmentEditor) {
 
   const { watch, setValue, formState } = useFormContext();
   const { dataset, field, key } = watch(props.name!); // Get the current value of the "attachments" field
-  const existing_attachments = dataset?.[field] ?? []
+  const existing_attachments = (dataset?.[field] && typeof dataset?.[field] === "string") ? [dataset?.[field]] : (dataset?.[field] ?? [])
   const fieldId = props?.id
 
   const removeAttachmentsKey = `${field}-`
   const addAttachmentsKey = `${field}+`
 
+  const isSmallTouchDevice = useIsSmallTouchDevice()
+
+  const showCameraButton = (() => {
+    return isSmallTouchDevice && allowedFileTypes?.find(t => t.startsWith("image/") || t.startsWith("video"))
+  })()
   const [filesForRemoval, setFilesForRemoval] = useState<Set<number>>(new Set());
   const [files, setFiles] = useState<File[]>([]);
 
@@ -50,12 +75,13 @@ export default function AttachmentEditor(props: AttachmentEditor) {
       return
 
     // FIXME This causes autocancelation issues
-    (async () => setFileToken(await pb.files.getToken()))()
+    (async () => setFileToken(await pb.files.getToken({ requestKey: null })))()
     firstLoad.current = true
   }, [])
 
   useEffect(() => {
     setFiles([])
+    setFilesForRemoval(new Set())
   }, [key])
 
   const setDebouncedError = (error: string, timeout = 200) => {
@@ -116,7 +142,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
   </div>
 
   // UPLOAD
-  const handlePaste = (event: ClipboardEvent|any) => {
+  const handlePaste = (event: ClipboardEvent | any) => {
     const items = event.clipboardData?.items;
     if (!items) return;
 
@@ -127,7 +153,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
         if (file) pastedFiles.push(file);
       } else {
         setError(errorMessageIllegalFiletype);
-        
+
         setDebouncedError("", 1000);
       }
     }
@@ -185,7 +211,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
 
   const handleDeleteFile = (index: number) => {
     const updatedFiles = files.filter((_, i) => i !== index);
-    setFiles(updatedFiles);
+    setFiles((_prev) => updatedFiles);
 
     // Update form state with the modified file list
     setValue(addAttachmentsKey, updatedFiles, { shouldDirty: true });  // Adjust according to your form structure
@@ -247,10 +273,10 @@ export default function AttachmentEditor(props: AttachmentEditor) {
         <FileIcon extension={extension} {...defaultStyles[extension]} />
       </div></div>
     }
-    return <div key={index} className={`py-2 ${(index !== 0 || existing_attachments.length > 0) ? "border-t border-gray-300" : ""}`}>
-      <div data-state={state} className="data-[state=trashed]:line-through data-[state=trashed]:text-red-400 flex items-center cursor-pointer" onClick={() => handleOpenFile(file)}>
+    return <div key={index} className={`py-2 ${(index !== 0 || existing_attachments.length > 0) ? "border-t border-gray-300 bg-teal-50" : ""}`}>
+      <div data-state={state} className="data-[state=trashed]:line-through data-[state=trashed]:text-red-400 flex items-center">
         {icon}
-        <span className="break-all flex-1 pl-2 text-left"><Badge className="bg-emerald-500">new</Badge> {file.name}</span>
+        <span onClick={() => handleOpenFile(file)} className="break-all flex-1 pl-2 text-left cursor-pointer"><Badge className="bg-emerald-500">new</Badge> {file.name}</span>
 
         <Button type="button" onClick={() => handleDeleteFile(index)} variant={"ghost"}><Trash2 /></Button>
       </div>
@@ -265,15 +291,16 @@ export default function AttachmentEditor(props: AttachmentEditor) {
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`border-input selection:bg-primary selection:text-primary-foreground border ${(error) ? "bg-red-100" : (isDragging ? "border-green-500 bg-green-100 cursor-pointer" : "border-gray-400")} shadow-xs transition-[color,box-shadow] outline-none p-2 rounded-md focus:border-ring focus:ring-ring/50 focus:ring-[3px] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive`}
+        data-no-focus-ring={isSmallTouchDevice}
+        className={`border-input selection:bg-primary selection:text-primary-foreground border ${(error) ? "bg-red-100" : (isDragging ? "border-green-500 bg-green-100 cursor-pointer" : "border-gray-400")} shadow-xs transition-[color,box-shadow] outline-none p-2 rounded-md focus:border-ring focus:ring-ring/50 focus:ring-[3px] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive data-[no-focus-ring=true]:focus:ring-0 data-[no-focus-ring=true]:focus-visible:ring-0`}
       >
         <div className="flex justify-between items-center">
-          <p aria-invalid={!!error} className={`aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive`}>{error || "Paste or Drag & Drop files here"}</p>
+          {(isSmallTouchDevice) ? <p></p> : <p aria-invalid={!!error} className={`aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive`}>{error || "Paste or Drag & Drop files here"}</p>}
           <span className="text-xs">
-            {files.length}/{props.options?.maxFiles ?? "∞"} files {(Array.from(files).reduce((acc, file) => acc + file.size, 0) / (1024 * 1024)).toFixed(2)}/{props.options?.uploadSizeLimitMb ?? "∞"}MB
+            {files.length + existing_attachments.length - filesForRemoval.size}/{props.options?.maxFiles ?? "∞"} files {(Array.from(files).reduce((acc, file) => acc + file.size, 0) / (1024 * 1024)).toFixed(2)}/{props.options?.uploadSizeLimitMb ?? "∞"}MB
           </span>
         </div>
-        {files.length + existing_attachments.length < 1 && <label htmlFor={fieldId} className="cursor-pointer p-2">
+        {!isSmallTouchDevice && files.length + existing_attachments.length < 1 && <label htmlFor={fieldId} className="cursor-pointer p-2">
           <FilePlus className="text-stone-300 m-auto" size={64} />
         </label>}
         {existingFiles}
@@ -284,13 +311,13 @@ export default function AttachmentEditor(props: AttachmentEditor) {
         </div>
 
         <div className="flex items-center justify-end">
-          <div>
+          {showCameraButton && <div>
             <input
               type="file"
               id="cameraInput"
               accept="image/*"
               capture="environment" // This triggers the camera
-              multiple
+              multiple={props.options?.maxFiles !== 1}
               className="hidden"
               onChange={handleAddFiles}
             />
@@ -299,14 +326,14 @@ export default function AttachmentEditor(props: AttachmentEditor) {
               className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-accent"
             >
               <Camera size={18} />
-              Take Foto
+              Open Camera
             </label>
-          </div>
+          </div>}
           <div>
             <input
               type="file"
               id={fieldId}
-              multiple
+              multiple={props.options?.maxFiles !== 1}
               className="hidden"
               onChange={handleAddFiles}
             />
