@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button.js";
 import TanstackLink from "@/components/ui/TanstackLink.js";
 import { getPbClients } from "@/state/queryClient.js";
 import { useQuery } from "@tanstack/react-query";
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Edit, Eye, FilePlus, Trash2 } from "lucide-react";
 import { RecordFullListOptions, RecordModel } from "pocketbase";
 import { Bounce, toast, ToastContentProps } from "react-toastify";
 import DeleteEntry from './DeleteEntry.js'
@@ -14,7 +14,7 @@ type ListRowOptions = {
     showViewLink?: boolean
     showDeleteLink?: boolean
     showEditLink?: boolean
-    rowClickAction?: "edit"|"delete"|"view"
+    rowClickAction?: "edit" | "delete" | "view"
 }
 
 export type ListEntriesProps = {} & ListRowOptions
@@ -30,6 +30,11 @@ export default function ListEntries({ collection, queryOptions, renderRow, showV
 
     return <div className="max-w-4xl">
         <DataLoader isPending={isPending} isFetching={isFetching} error={error}>
+            {
+                !data?.length && <div className="flex flex-col items-center justify-center min-h-screen lg:justify-start lg:mt-32">
+                    <TanstackLink to={'./new'}><FilePlus size={48} /></TanstackLink>
+                </div>
+            }
             {data?.map((row) => {
                 const showRow = (typeof renderRow === "function") ? renderRow(row) : row.id
 
