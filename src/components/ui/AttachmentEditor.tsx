@@ -57,6 +57,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
 
   useEffect(() => {
     setFiles([])
+    setFilesForRemoval(new Set())
   }, [key])
 
   const setDebouncedError = (error: string, timeout = 200) => {
