@@ -32,7 +32,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
 
   const { watch, setValue, formState } = useFormContext();
   const { dataset, field, key } = watch(props.name!); // Get the current value of the "attachments" field
-  const existing_attachments = dataset?.[field] ?? []
+  const existing_attachments = (typeof dataset?.[field] === "string") ? [dataset?.[field]] : (dataset?.[field] ?? [])
   const fieldId = props?.id
 
   const removeAttachmentsKey = `${field}-`
@@ -271,7 +271,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
         <div className="flex justify-between items-center">
           <p aria-invalid={!!error} className={`aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive`}>{error || "Paste or Drag & Drop files here"}</p>
           <span className="text-xs">
-            {files.length}/{props.options?.maxFiles ?? "∞"} files {(Array.from(files).reduce((acc, file) => acc + file.size, 0) / (1024 * 1024)).toFixed(2)}/{props.options?.uploadSizeLimitMb ?? "∞"}MB
+            {files.length + existing_attachments.length - filesForRemoval.size}/{props.options?.maxFiles ?? "∞"} files {(Array.from(files).reduce((acc, file) => acc + file.size, 0) / (1024 * 1024)).toFixed(2)}/{props.options?.uploadSizeLimitMb ?? "∞"}MB
           </span>
         </div>
         {files.length + existing_attachments.length < 1 && <label htmlFor={fieldId} className="cursor-pointer p-2">
