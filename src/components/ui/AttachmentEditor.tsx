@@ -187,7 +187,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
 
   const handleDeleteFile = (index: number) => {
     const updatedFiles = files.filter((_, i) => i !== index);
-    setFiles(updatedFiles);
+    setFiles((_prev) => updatedFiles);
 
     // Update form state with the modified file list
     setValue(addAttachmentsKey, updatedFiles, { shouldDirty: true });  // Adjust according to your form structure
@@ -292,7 +292,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
               id="cameraInput"
               accept="image/*"
               capture="environment" // This triggers the camera
-              multiple
+              multiple={props.options?.maxFiles !== 1}
               className="hidden"
               onChange={handleAddFiles}
             />
@@ -308,7 +308,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
             <input
               type="file"
               id={fieldId}
-              multiple
+              multiple={props.options?.maxFiles !== 1}
               className="hidden"
               onChange={handleAddFiles}
             />
