@@ -51,7 +51,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
       return
 
     // FIXME This causes autocancelation issues
-    (async () => setFileToken(await pb.files.getToken()))()
+    (async () => setFileToken(await pb.files.getToken({ requestKey: null })))()
     firstLoad.current = true
   }, [])
 
