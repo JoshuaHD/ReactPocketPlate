@@ -249,10 +249,10 @@ export default function AttachmentEditor(props: AttachmentEditor) {
         <FileIcon extension={extension} {...defaultStyles[extension]} />
       </div></div>
     }
-    return <div key={index} className={`py-2 ${(index !== 0 || existing_attachments.length > 0) ? "border-t border-gray-300" : ""}`}>
-      <div data-state={state} className="data-[state=trashed]:line-through data-[state=trashed]:text-red-400 flex items-center cursor-pointer" onClick={() => handleOpenFile(file)}>
+    return <div key={index} className={`py-2 ${(index !== 0 || existing_attachments.length > 0) ? "border-t border-gray-300 bg-teal-50" : ""}`}>
+      <div data-state={state} className="data-[state=trashed]:line-through data-[state=trashed]:text-red-400 flex items-center">
         {icon}
-        <span className="break-all flex-1 pl-2 text-left"><Badge className="bg-emerald-500">new</Badge> {file.name}</span>
+        <span onClick={() => handleOpenFile(file)} className="break-all flex-1 pl-2 text-left cursor-pointer"><Badge className="bg-emerald-500">new</Badge> {file.name}</span>
 
         <Button type="button" onClick={() => handleDeleteFile(index)} variant={"ghost"}><Trash2 /></Button>
       </div>
