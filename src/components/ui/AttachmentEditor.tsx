@@ -7,6 +7,11 @@ import { pb } from "@/settings.js";
 import { Badge } from "./badge.js";
 import { FormMessage } from "./form.js";
 
+const DROP_ZONE_INSTRUCTION = "Paste or Drag & Drop files here"
+const ERROR_ILLEGAL_FILETYPE = "Filetype not allowed"
+const OPEN_CAMERA = "Open Camera"
+const UPLOAD_FILES = "Add Files"
+
 export type AttachmentEditorOptions = {
   db_field_name: string,
   uploadSizeLimitMb?: number,
@@ -21,8 +26,6 @@ type AttachmentEditor = ComponentProps<"input"> & {
 const previewExtensions = [
   "png", "jpg", "jpeg", "gif", "bmp", "webp", "svg", "ico", "tiff", "tif", "avif"
 ];
-
-const errorMessageIllegalFiletype = "Filetype not allowed"
 
 function useIsSmallTouchDevice() {
   return useSyncExternalStore(
@@ -152,7 +155,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
         const file = item.getAsFile();
         if (file) pastedFiles.push(file);
       } else {
-        setError(errorMessageIllegalFiletype);
+        setError(ERROR_ILLEGAL_FILETYPE);
 
         setDebouncedError("", 1000);
       }
@@ -178,8 +181,8 @@ export default function AttachmentEditor(props: AttachmentEditor) {
       item.kind === "file" && allowedFileTypes.includes(item.type)
     );
 
-    if (!error && error !== errorMessageIllegalFiletype) {
-      setError(hasOnlyAllowedFiles ? "" : errorMessageIllegalFiletype);
+    if (!error && error !== ERROR_ILLEGAL_FILETYPE) {
+      setError(hasOnlyAllowedFiles ? "" : ERROR_ILLEGAL_FILETYPE);
     } else {
       setDebouncedError("", 150)
     }
@@ -239,8 +242,8 @@ export default function AttachmentEditor(props: AttachmentEditor) {
 
     if (newFiles.length > 0 && filteredFiles.length === 0) {
 
-      if (error !== errorMessageIllegalFiletype)
-        setDebouncedError(errorMessageIllegalFiletype);
+      if (error !== ERROR_ILLEGAL_FILETYPE)
+        setDebouncedError(ERROR_ILLEGAL_FILETYPE);
       return false;
     }
 
@@ -295,7 +298,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
         className={`border-input selection:bg-primary selection:text-primary-foreground border ${(error) ? "bg-red-100" : (isDragging ? "border-green-500 bg-green-100 cursor-pointer" : "border-gray-400")} shadow-xs transition-[color,box-shadow] outline-none p-2 rounded-md focus:border-ring focus:ring-ring/50 focus:ring-[3px] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive data-[no-focus-ring=true]:focus:ring-0 data-[no-focus-ring=true]:focus-visible:ring-0`}
       >
         <div className="flex justify-between items-center">
-          {(isSmallTouchDevice) ? <p></p> : <p aria-invalid={!!error} className={`aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive`}>{error || "Paste or Drag & Drop files here"}</p>}
+          {(isSmallTouchDevice && !error) ? <p></p> : <p aria-invalid={!!error} className={`aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive`}>{error || DROP_ZONE_INSTRUCTION}</p>}
           <span className="text-xs">
             {files.length + existing_attachments.length - filesForRemoval.size}/{props.options?.maxFiles ?? "∞"} files {(Array.from(files).reduce((acc, file) => acc + file.size, 0) / (1024 * 1024)).toFixed(2)}/{props.options?.uploadSizeLimitMb ?? "∞"}MB
           </span>
@@ -314,25 +317,26 @@ export default function AttachmentEditor(props: AttachmentEditor) {
           {showCameraButton && <div>
             <input
               type="file"
-              id="cameraInput"
-              accept="image/*"
+              id="_cameraInput"
+              accept={allowedFileTypes?.join(",")}
               capture="environment" // This triggers the camera
               multiple={props.options?.maxFiles !== 1}
               className="hidden"
               onChange={handleAddFiles}
             />
             <label
-              htmlFor="cameraInput"
+              htmlFor="_cameraInput"
               className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-accent"
             >
               <Camera size={18} />
-              Open Camera
+              {OPEN_CAMERA}
             </label>
           </div>}
           <div>
             <input
               type="file"
               id={fieldId}
+              accept={allowedFileTypes?.join(",")}
               multiple={props.options?.maxFiles !== 1}
               className="hidden"
               onChange={handleAddFiles}
@@ -343,7 +347,7 @@ export default function AttachmentEditor(props: AttachmentEditor) {
               className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-accent"
             >
               <Upload size={18} />
-              Add Files
+              {UPLOAD_FILES}
             </label>
           </div>
         </div>
