@@ -28,7 +28,7 @@ export default function ListEntries({ collection, queryOptions, renderRow, showV
 
     rowClickAction = rowClickAction ?? "view"
 
-    return <div className="max-w-4xl">
+    return <div className="max-w-4xl overflow-hidden">
         <DataLoader isPending={isPending} isFetching={isFetching} error={error}>
             {
                 !data?.length && <div className="flex flex-col items-center justify-center min-h-screen lg:justify-start lg:mt-32">
@@ -60,8 +60,8 @@ export default function ListEntries({ collection, queryOptions, renderRow, showV
                         }
                     );
                 };
-                return <div key={row.id} className={"flex p-2 hover:bg-slate-200 active:bg-slate-200"}>
-                    <TanstackLink to={rowClickLink} className="flex-1">
+                return <div key={row.id} className={"flex p-2 hover:bg-slate-200 active:bg-slate-200 border-b first:border-t border-slate-300"}>
+                    <TanstackLink to={rowClickLink} className="flex-1 overflow-auto">
                         {showRow}
                     </TanstackLink>
 
