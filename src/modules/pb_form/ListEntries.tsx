@@ -60,7 +60,7 @@ export default function ListEntries({ collection, queryOptions, renderRow, showV
                         }
                     );
                 };
-                return <div key={row.id} className={"flex p-2 hover:bg-slate-200"}>
+                return <div key={row.id} className={"flex p-2 hover:bg-slate-200 active:bg-slate-200"}>
                     <TanstackLink to={rowClickLink} className="flex-1">
                         {showRow}
                     </TanstackLink>
