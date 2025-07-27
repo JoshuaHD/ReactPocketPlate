@@ -1,4 +1,5 @@
 import GoBackLink from '@/components/ui/GoBackLink.js'
+import { PageSetup } from '@/modules/pb_collection_settings/types.js'
 import ViewEntry from '@/modules/pb_form/ViewEntry.js'
 import queryClient, { getPbClients } from '@/state/queryClient.js'
 import { createFileRoute, notFound } from '@tanstack/react-router'
@@ -17,7 +18,9 @@ export const Route = createFileRoute('/(pb)/$collection/$recordId')({
 })
 
 function RouteComponent() {
-  const { recordId, collection } = Route.useParams()
+  const { recordId } = Route.useParams()
+  const { collection } = Route.useRouteContext();
+
   return <div>
     <div><GoBackLink fallbackLink='../' /></div>
     <ViewEntry recordId={recordId} collection={collection} />

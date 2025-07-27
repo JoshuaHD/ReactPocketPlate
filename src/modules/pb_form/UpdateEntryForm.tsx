@@ -14,6 +14,7 @@ import { Loader2 } from "lucide-react"
 import queryClient, { getPbClients } from "@/state/queryClient.js"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { OrphanError, getOrphanErrors, formBlocker } from "./utils.js"
+import { Route } from "@/routes/(pb)/$collection/$recordId_.edit.js"
 
 type UpdateEntryForm<T extends ZodRawShape> = {
     recordId: string;
@@ -27,7 +28,10 @@ export default function UpdateEntryForm<T extends ZodRawShape>({ recordId, colle
     const router = useRouter()
     const canGoBack = useCanGoBack()
     const [action, setAction] = useState<"back" | "stay">()
-    const { data } = useQuery(getPbClients(collection).getOne(recordId))
+    
+    const {data: initialData} = Route.useLoaderData();
+    const { data } = useQuery({...getPbClients(collection).getOne(recordId), initialData})
+    
     const [formId, _setFormId] = useState(new Date().getTime())
 
     // When this mutation succeeds, invalidate any queries with the `todos` or `reminders` query key
