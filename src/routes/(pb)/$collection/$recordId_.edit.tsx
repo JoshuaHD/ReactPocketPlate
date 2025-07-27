@@ -7,8 +7,11 @@ import { PageSetup } from '@/modules/pb_collection_settings/types.js'
 
 export const Route = createFileRoute('/(pb)/$collection/$recordId_/edit')({
   component: RouteComponent,
-  
-  loader: ({ params: { recordId, }, context: { collection_settings, collection } }: any) => queryClient.ensureQueryData(getPbClients(collection).getOne(recordId)).then(() => ({ collection_settings })),
+
+  loader: ({ params: { recordId, }, context: { collection_settings, collection } }: any) => {
+    return queryClient.ensureQueryData(getPbClients(collection).getOne(recordId))
+                      .then((data) => ({ collection_settings, data }))
+  }
 })
 
 function RouteComponent() {
