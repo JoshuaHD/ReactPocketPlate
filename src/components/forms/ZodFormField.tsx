@@ -6,7 +6,7 @@ import { Input } from "../ui/input.js"
 import { ZodFormFieldMetaData } from "./zod_schema_helpers.js"
 
 type ZodFormField<TSchema extends z.ZodObject<any>> = {
-    form: UseFormReturn<any, any, undefined>;
+    form: UseFormReturn<any, any, any>;
     name: Path<TypeOf<TSchema>>;
     fieldMetaData: ZodFormFieldMetaData<string> | ZodFormFieldMetaData<boolean> | ZodFormFieldMetaData<Record<string, any>> | ZodFormFieldMetaData<string | Record<string, any>> | ZodFormFieldMetaData<File[] | undefined> | ZodFormFieldMetaData<object> | ZodFormFieldMetaData<any>
 }
